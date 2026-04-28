@@ -1,0 +1,254 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  CLIENT
+}
+
+enum ClientStatus {
+  ACTIVE
+  PAUSED
+  CHURNED
+  ARCHIVED
+}
+
+enum ProspectStage {
+  NEW_LEAD
+  CONTACTED
+  CALL_BOOKED
+  PROPOSAL_SENT
+  NEGOTIATING
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum ActivityType {
+  NOTE
+  CALL
+  EMAIL
+}
+
+enum CampaignStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+enum LeadSource {
+  COLD_EMAIL
+  META_AD
+  GOOGLE_AD
+  REFERRAL
+}
+
+enum LeadQuality {
+  HOT
+  WARM
+  COLD
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED_BY_CLIENT
+  CONVERTED
+  NOT_INTERESTED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         UserRole @default(CLIENT)
+  clientId     String?  @map("client_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  client          Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  createdMessages Message[] @relation("MessageCreator")
+
+  @@map("users")
+}
+
+model Client {
+  id              String       @id @default(cuid())
+  businessName    String       @map("business_name")
+  contactName     String       @map("contact_name")
+  email           String       @unique
+  phone           String?
+  niche           String
+  location        String
+  website         String?
+  retainerAmount  Decimal      @db.Decimal(10, 2) @map("retainer_amount")
+  leadTarget      Int          @map("lead_target")
+  status          ClientStatus @default(ACTIVE)
+  contractStart   DateTime     @map("contract_start")
+  createdAt       DateTime     @default(now()) @map("created_at")
+
+  users     User[]
+  leads     Lead[]
+  invoices  Invoice[]
+  messages  Message[]
+  campaigns Campaign[]
+
+  @@map("clients")
+}
+
+model Prospect {
+  id             String        @id @default(cuid())
+  businessName   String        @map("business_name")
+  contactName    String        @map("contact_name")
+  email          String
+  phone          String?
+  niche          String
+  location       String
+  website        String?
+  linkedin       String?
+  stage          ProspectStage @default(NEW_LEAD)
+  estimatedValue Decimal       @db.Decimal(10, 2) @map("estimated_value")
+  notes          String?
+  createdAt      DateTime      @default(now()) @map("created_at")
+
+  activities ProspectActivity[]
+  campaigns  CampaignProspect[]
+
+  @@map("prospects")
+}
+
+model ProspectActivity {
+  id         String       @id @default(cuid())
+  prospectId String       @map("prospect_id")
+  type       ActivityType @default(NOTE)
+  note       String
+  createdAt  DateTime     @default(now()) @map("created_at")
+
+  prospect Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+
+  @@map("prospect_activities")
+}
+
+model Campaign {
+  id              String         @id @default(cuid())
+  name            String
+  niche           String
+  prospectsCount  Int            @default(0) @map("prospects_count")
+  emailsSent      Int            @default(0) @map("emails_sent")
+  openRate        Decimal        @default(0) @db.Decimal(5, 2) @map("open_rate")
+  replyRate       Decimal        @default(0) @db.Decimal(5, 2) @map("reply_rate")
+  positiveReplies Int            @default(0) @map("positive_replies")
+  callsBooked     Int            @default(0) @map("calls_booked")
+  status          CampaignStatus @default(ACTIVE)
+  notes           String?
+  clientId        String?        @map("client_id")
+  createdAt       DateTime       @default(now()) @map("created_at")
+
+  client    Client?            @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  prospects CampaignProspect[]
+
+  @@map("campaigns")
+}
+
+model CampaignProspect {
+  id         String @id @default(cuid())
+  campaignId String @map("campaign_id")
+  prospectId String @map("prospect_id")
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  prospect Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, prospectId])
+  @@map("campaign_prospects")
+}
+
+model Lead {
+  id           String      @id @default(cuid())
+  clientId     String      @map("client_id")
+  leadName     String      @map("lead_name")
+  businessName String      @map("business_name")
+  email        String
+  phone        String?
+  source       LeadSource
+  quality      LeadQuality
+  status       LeadStatus  @default(NEW)
+  notes        String?
+  deliveredAt  DateTime    @map("delivered_at")
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("leads")
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  clientId      String        @map("client_id")
+  invoiceNumber String        @unique @map("invoice_number")
+  invoiceDate   DateTime      @map("invoice_date")
+  dueDate       DateTime      @map("due_date")
+  lineItems     Json          @map("line_items")
+  subtotal      Decimal       @db.Decimal(10, 2)
+  vatAmount     Decimal       @db.Decimal(10, 2) @map("vat_amount")
+  total         Decimal       @db.Decimal(10, 2)
+  status        InvoiceStatus @default(DRAFT)
+  createdAt     DateTime      @default(now()) @map("created_at")
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("invoices")
+}
+
+model EmailTemplate {
+  id        String   @id @default(cuid())
+  name      String
+  subject   String
+  body      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("email_templates")
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  clientId  String   @map("client_id")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String   @map("created_by")
+
+  client  Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  creator User   @relation("MessageCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model AgencySetting {
+  id                      String   @id @default(cuid())
+  agencyName              String   @default("KRAVEX") @map("agency_name")
+  logoUrl                 String?  @map("logo_url")
+  address                 String?
+  vatNumber               String?  @map("vat_number")
+  notificationPreferences Json     @default("{\"overdueInvoices\":true,\"leadTargets\":true}") @map("notification_preferences")
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+
+  @@map("agency_settings")
+}
+
+model Niche {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("niches")
+}
