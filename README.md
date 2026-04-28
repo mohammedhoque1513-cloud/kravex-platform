@@ -60,13 +60,17 @@ A starter [`render.yaml`](</C:/Users/emdad/OneDrive/Documents/New project/render
 
 - `kravex-api` as a Node web service
 - `kravex-web` as a static site
+- `kravex-db` as a managed Render PostgreSQL database
+
+Render will provision the database connection string and JWT secret from the Blueprint.
 
 Set these environment variables before going live:
 
-- `DATABASE_URL`
-- `JWT_SECRET`
 - `CLIENT_URL`
 - `VITE_API_URL`
+- `NODE_ENV=production`
+- `KRAVEX_USE_EMBEDDED_DB=false`
+- `KRAVEX_SEED_ON_BOOT=false`
 
 After deployment:
 
@@ -74,6 +78,11 @@ After deployment:
 2. Point the API to a subdomain such as `api.kravex.co.uk`
 3. Set `CLIENT_URL=https://kravex.co.uk`
 4. Set `VITE_API_URL=https://api.kravex.co.uk/api`
+
+Production note:
+
+- the embedded Windows database is only for local development
+- on Render, use a managed PostgreSQL instance and keep demo seeding disabled
 
 ### Railway
 

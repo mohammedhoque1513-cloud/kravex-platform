@@ -7,24 +7,28 @@
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
     "prisma:migrate": "prisma migrate dev --name init",
+    "prisma:deploy": "prisma migrate deploy",
     "prisma:generate": "prisma generate",
     "prisma:seed": "node prisma/seed.js"
   },
   "dependencies": {
-    "@embedded-postgres/windows-x64": "^18.3.0-beta.17",
     "@prisma/client": "^5.22.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "embedded-postgres": "^18.3.0-beta.17",
     "express": "^4.21.2",
     "express-validator": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
-    "pdfkit": "^0.15.2"
+    "pdfkit": "^0.15.2",
+    "pg": "^8.13.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.9",
     "prisma": "^5.22.0"
+  },
+  "optionalDependencies": {
+    "@embedded-postgres/windows-x64": "^18.3.0-beta.17",
+    "embedded-postgres": "^18.3.0-beta.17"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

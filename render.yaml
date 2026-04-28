@@ -1,25 +1,35 @@
 services:
   - type: web
     name: kravex-api
-    env: node
+    runtime: node
     rootDir: server
-    buildCommand: npm install && npx prisma generate && npx prisma migrate deploy
+    buildCommand: npm install && npx prisma generate
+    preDeployCommand: npx prisma migrate deploy
     startCommand: npm start
     envVars:
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: kravex-db
+          property: connectionString
       - key: JWT_SECRET
-        sync: false
+        generateValue: true
       - key: CLIENT_URL
         sync: false
+      - key: NODE_ENV
+        value: production
+      - key: KRAVEX_USE_EMBEDDED_DB
+        value: "false"
+      - key: KRAVEX_SEED_ON_BOOT
+        value: "false"
       - key: PORT
         value: 10000
 
-  - type: static
+  - type: web
     name: kravex-web
+    runtime: static
     rootDir: client
     buildCommand: npm install && npm run build
-    publishPath: dist
+    staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
         sync: false
@@ -27,3 +37,8 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
+
+databases:
+  - name: kravex-db
+    databaseName: kravex
+    plan: basic-256mb

@@ -24,6 +24,12 @@ const pwFile = path.join(serverRoot, "postgres-pw.txt");
 
 let started = false;
 
+function shouldUseEmbeddedDatabase() {
+  if (process.env.KRAVEX_USE_EMBEDDED_DB === "true") return true;
+  if (process.env.KRAVEX_USE_EMBEDDED_DB === "false") return false;
+  return !process.env.DATABASE_URL && process.env.NODE_ENV !== "production";
+}
+
 function postgresEnv() {
   return {
     ...process.env,
@@ -176,6 +182,16 @@ async function ensureSeedData() {
 export async function startEmbeddedDatabase() {
   if (started) return;
 
+  const usingEmbeddedDatabase = shouldUseEmbeddedDatabase();
+
+  if (!usingEmbeddedDatabase) {
+    if (!process.env.DATABASE_URL) {
+      throw new Error("DATABASE_URL is required when embedded database boot is disabled.");
+    }
+    started = true;
+    return;
+  }
+
   process.env.DATABASE_URL = process.env.DATABASE_URL || `postgresql://${superUser}:${superPassword}@127.0.0.1:${databasePort}/${databaseName}?schema=public`;
 
   if (process.env.KRAVEX_SKIP_DB_BOOT !== "true") {
@@ -186,7 +202,9 @@ export async function startEmbeddedDatabase() {
   if (process.env.KRAVEX_SKIP_PRISMA_SYNC !== "true") {
     await ensurePrismaClient();
     await runPrisma(["db", "push", "--schema", prismaSchemaPath, "--skip-generate"]);
-    await ensureSeedData();
+    if (process.env.KRAVEX_SEED_ON_BOOT !== "false") {
+      await ensureSeedData();
+    }
   }
   started = true;
 }
