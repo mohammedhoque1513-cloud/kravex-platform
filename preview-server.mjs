@@ -143,6 +143,7 @@ const html = String.raw`<!doctype html>
       securityEvents:[],
       messages:[],
       botChats:{},
+      botMemory:{},
       approvalActions:[],
       botActivity:[],
       activeBot:'ceo',
@@ -359,6 +360,13 @@ const html = String.raw`<!doctype html>
     function botLabel(botId){ const bot=botById(botId); return bot.name+' ('+bot.title+')'; }
     function ensureBotChats(){ if(!state.botChats || typeof state.botChats!=='object') state.botChats={}; botDefinitions.forEach(bot=>{ if(!Array.isArray(state.botChats[bot.id])) state.botChats[bot.id]=[{role:'bot',text:'Hi, I’m '+bot.name+'. '+bot.purpose+' I’m online and already watching the business.'}]; }); if(!state.activeBot) state.activeBot='ceo'; }
     ensureBotChats();
+    function ensureBotMemory(){
+      if(!state.botMemory || typeof state.botMemory!=='object') state.botMemory={};
+      botDefinitions.forEach(bot=>{
+        if(!state.botMemory[bot.id]) state.botMemory[bot.id]={lastTopic:'',lastClient:'',lastProspect:'',pendingQuestion:'',conversationGoal:'',notes:[]};
+      });
+    }
+    ensureBotMemory();
     function selectBot(id){ state.activeBot=id; persist(); render(); }
     function nextCallBrief(){
       const prospect=followUpProspectsData().find(p=>p.stage==='CALL_BOOKED') || followUpProspectsData()[0];
@@ -378,6 +386,43 @@ const html = String.raw`<!doctype html>
         admin:'I’m keeping the operating system tidy so things do not slip.'
       };
       return bot.name+': '+intros[botId];
+    }
+    function remember(botId, patch){
+      ensureBotMemory();
+      state.botMemory[botId]={...state.botMemory[botId], ...patch};
+    }
+    function botMemoryFor(botId){
+      ensureBotMemory();
+      return state.botMemory[botId];
+    }
+    function detectClientMention(text){
+      const value=String(text||'').toLowerCase();
+      return state.clients.find(c=>value.includes(String(c.business||'').toLowerCase()) || (c.contact && value.includes(String(c.contact).toLowerCase()))) || null;
+    }
+    function detectProspectMention(text){
+      const value=String(text||'').toLowerCase();
+      return state.prospects.find(p=>value.includes(String(p.business||'').toLowerCase()) || (p.contact && value.includes(String(p.contact).toLowerCase()))) || null;
+    }
+    function conciseClientState(client){
+      if(!client) return '';
+      const delivered=deliveredForClient(client);
+      const invoice=latestInvoiceForClient(client);
+      return client.business+' is at '+delivered+'/'+(client.target||0)+' leads this month'+(invoice ? ', latest invoice is '+invoice.status.toLowerCase() : '')+'.';
+    }
+    function conversationalQuestion(botId){
+      const prompts={
+        ceo:'Before I push further, do you want me to focus on sales, clients, or cash first?',
+        sales:'Do you want me focused on dentists, clinics, roofers, or another niche?',
+        delivery:'Which client or campaign do you want me to inspect first?',
+        success:'Who are you most worried about losing right now?',
+        cfo:'Do you want the safe owner number, the overdue list, or the broader cash-flow picture?',
+        admin:'Do you want me tidying CRM records, templates, or the approval queue first?'
+      };
+      return prompts[botId];
+    }
+    function extractCallTime(text){
+      const match=String(text||'').match(/(\d{1,2}(?::\d{2})?\s?(?:am|pm)?)/i);
+      return match ? match[1] : '';
     }
     function plainList(items, emptyText){
       return items.length ? items.join(' ') : emptyText;
@@ -413,43 +458,73 @@ const html = String.raw`<!doctype html>
       const overdues=overdueInvoicesData();
       const weak=weakCampaignsData();
       const followUps=followUpProspectsData();
+      const memory=botMemoryFor(botId);
+      const mentionedClient=detectClientMention(prompt) || state.clients.find(c=>c.business===memory.lastClient) || null;
+      const mentionedProspect=detectProspectMention(prompt) || state.prospects.find(p=>p.business===memory.lastProspect) || null;
+      if(mentionedClient) remember(botId,{lastClient:mentionedClient.business});
+      if(mentionedProspect) remember(botId,{lastProspect:mentionedProspect.business});
+      if(text.includes('call')) remember(botId,{lastTopic:'call'});
+      if(text.includes('client') || text.includes('lead')) remember(botId,{lastTopic:'client'});
+      if(text.includes('money') || text.includes('invoice') || text.includes('cash')) remember(botId,{lastTopic:'finance'});
+      if(text.includes('prospect') || text.includes('follow') || text.includes('chasing')) remember(botId,{lastTopic:'sales'});
+      if(memory.pendingQuestion){
+        const pending=memory.pendingQuestion;
+        remember(botId,{pendingQuestion:''});
+        if(pending==='ask-client' && mentionedClient) return opening(botId)+' Got it. '+conciseClientState(mentionedClient)+' '+(botId==='delivery' ? (weak.filter(c=>c.client===mentionedClient.business).length ? 'The weak point is campaign performance.' : 'Nothing major looks broken there right now.') : botId==='success' ? (risks.find(c=>c.business===mentionedClient.business) ? 'That account is on the watchlist.' : 'That client does not look risky at the moment.') : botId==='cfo' ? ((latestInvoiceForClient(mentionedClient)?.status!=='PAID') ? 'There is still money outstanding on that account.' : 'Their latest invoice looks settled.') : 'I can work from that.');
+        if(pending==='ask-niche') return opening(botId)+' Perfect. I’ll treat '+prompt.trim()+' as the focus niche and shape the next push around it.';
+      }
       if(botId==='ceo'){
-        if(text.includes('what should i do today')) return opening(botId)+' Today I’d keep it very simple. '+plainList(tasks.slice(0,3).map((t,i)=>(i+1)+'. '+t.text), 'There are no urgent tasks, so your best move is outreach and relationship calls.')+' You do not need to touch the admin clutter unless one of us escalates it.';
-        if(text.includes('what needs my attention')) return opening(botId)+' Right now the main things on your desk are: '+plainList(alerts.slice(0,4).map(a=>a.title+'.'), 'Nothing critical is flashing.') ;
+        if(text.includes('what\'s going on') || text.includes('whats going on') || text==='today' || text==='update') return opening(botId)+' Here’s the quick pulse. '+plainList(alerts.slice(0,3).map(a=>a.title+'.'), 'Nothing dramatic is on fire.')+' Top priority is '+tasks[0].text+'.';
+        if(text.includes('what should i do today') || text.includes('what should i do next')) return opening(botId)+' Today I’d keep it very simple. '+plainList(tasks.slice(0,3).map((t,i)=>(i+1)+'. '+t.text), 'There are no urgent tasks, so your best move is outreach and relationship calls.')+' You do not need to touch the admin clutter unless one of us escalates it.';
+        if(text.includes('what needs my attention')) return opening(botId)+' Right now the main things on your desk are: '+plainList(alerts.slice(0,4).map(a=>a.title+'.'), 'Nothing critical is flashing.');
         if(text.includes('are clients happy') || text.includes('clients at risk')) return risks.length ? opening(botId)+' A few accounts need watching. '+risks.map(c=>c.business+' is at '+c.delivered+'/'+c.target+' leads'+(c.unpaid?', and there is also an unpaid invoice.':'.')).join(' ') : opening(botId)+' Clients look steady at the moment. No obvious churn signals are jumping out.';
         if(text.includes('making money') || text.includes('money')) return opening(botId)+' Yes, and here is the clean number: owner-safe money is '+money(ownerAmount().owner)+'. Outstanding invoices sit at '+money(state.invoices.filter(i=>i.status!=='PAID').reduce((s,i)=>s+i.total,0))+', and VAT set-aside is '+money(ownerAmount().vat)+'.';
         if(text.includes('broken') || text.includes('improve')) return alerts.length ? opening(botId)+' What looks broken or at least weak is this: '+alerts.slice(0,4).map(a=>a.title).join('; ')+'. If I had to improve one thing first, it would be '+(weak[0]?.title || followUps[0]?.title || 'top-of-funnel prospecting')+'.' : opening(botId)+' Nothing feels badly broken. The next improvement move is more outbound and tighter weekly client updates.';
+        if(text.includes('anything broken')) return alerts.length ? opening(botId)+' A few things look weak rather than catastrophic: '+alerts.slice(0,4).map(a=>a.title).join('; ')+'.' : opening(botId)+' Nothing looks properly broken right now.';
         if(text.includes('what do you need from me')) return opening(botId)+' I need you for '+pendingApprovals().length+' approval(s) and any live calls that need your voice. Everything else can stay with us.';
         return opening(botId)+' Focus on '+tasks[0].text+' and keep one eye on '+(alerts[0]?.title || 'steady client delivery')+'.';
       }
       if(botId==='sales'){
+        if(text.includes('who needs chasing') || text.includes('who needs follow') || text.includes('who do i chase')) return followUps.length ? opening(botId)+' If you want the short list, chase '+followUps.slice(0,5).map(p=>p.title+' ('+label(p.stage)+')').join(', ')+'.' : opening(botId)+' Nobody is properly queued for chasing yet. We need more pipeline first.';
         if(text.includes('find me more clients')) return opening(botId)+' Best hunting ground right now is '+(state.settings.niches||[]).slice(0,4).join(', ')+'. I’d go niche by niche, build fresh prospect lists, prepare outreach, and only pull you in once replies turn into calls.';
         if(text.includes('follow-up')) return followUps.length ? opening(botId)+' These are warm enough to push today: '+followUps.slice(0,5).map(p=>p.title+' ('+label(p.stage)+')').join(', ')+'.' : opening(botId)+' No proper follow-up queue exists yet, which usually means we need more pipeline volume.';
-        if(text.includes('prepare me for my next call') || text.includes('next call')) return opening(botId)+' '+nextCallBrief();
+        if(text.includes('prepare me for my next call') || text.includes('next call')) return opening(botId)+' '+(extractCallTime(prompt) ? 'For your '+extractCallTime(prompt)+' call, ' : '')+nextCallBrief();
+        if(text.includes('prospect') && !mentionedProspect && !followUps.length){
+          remember(botId,{pendingQuestion:'ask-niche'});
+          return opening(botId)+' I can do that, but I need a direction first. '+conversationalQuestion(botId);
+        }
         return opening(botId)+' Sales queue is '+(followUps.length ? followUps.slice(0,3).map(p=>p.title).join(', ') : 'a little too light, so I would start with prospect research and fresh outreach')+'.';
       }
       if(botId==='delivery'){
+        if(text.includes('why are leads low') || text.includes('leads low')){
+          if(mentionedClient) return opening(botId)+' For '+mentionedClient.business+', '+conciseClientState(mentionedClient)+' '+(weak.find(c=>c.client===mentionedClient.business) ? 'The campaign is underperforming, so I’d start with the traffic and targeting.' : 'The issue looks more like volume or campaign coverage than a hard failure.');
+          remember(botId,{pendingQuestion:'ask-client'});
+          return opening(botId)+' I can answer that properly, but tell me which client or campaign you mean. '+conversationalQuestion(botId);
+        }
         if(text.includes('broken') || text.includes('weak')) return weak.length ? opening(botId)+' The weak spots are '+weak.map(c=>c.title).join(', ')+'.' : opening(botId)+' No campaign is clearly under water right now.';
         if(text.includes('lead') || text.includes('client')) return state.clients.length ? opening(botId)+' Delivery by client: '+state.clients.map(c=>c.business+' at '+deliveredForClient(c)+'/'+(c.target||0)).join(' | ')+'.' : opening(botId)+' We do not have client delivery records yet.';
         return weak.length ? opening(botId)+' First fix would be '+weak[0].title+'.' : opening(botId)+' Delivery looks steady right now.';
       }
       if(botId==='success'){
+        if(text.includes('why') && mentionedClient) return opening(botId)+' The short version on '+mentionedClient.business+' is this: '+conciseClientState(mentionedClient)+' That is why I’m watching them.';
         if(text.includes('clients at risk') || text.includes('unhappy')) return risks.length ? opening(botId)+' Watch these closely: '+risks.map(c=>c.business+' at '+c.delivered+'/'+c.target+' leads'+(c.unpaid?', plus an unpaid invoice':'')).join(', ')+'.' : opening(botId)+' No client is waving a red flag at the moment.';
         if(text.includes('need to call')) return risks.length ? opening(botId)+' You should call '+risks[0].business+' first. That one has the highest chance of turning into a save call.' : opening(botId)+' No urgent client rescue call is needed right now.';
         return risks.length ? opening(botId)+' Retention watchlist is '+risks.map(c=>c.business).join(', ')+'.' : opening(botId)+' Clients look calm from a retention point of view.';
       }
       if(botId==='cfo'){
+        if(text.includes('can i take') || text.includes('take out')) return opening(botId)+' Right now, yes — '+money(ownerAmount().owner)+' is the safe owner number. I would still leave VAT alone.';
         if(text.includes('how much money can i take out') || text.includes('owner money')) return opening(botId)+' You can safely take '+money(ownerAmount().owner)+' right now. I would leave VAT set-aside untouched at '+money(ownerAmount().vat)+'.';
         if(text.includes('cash flow') || text.includes('risky')) return overdues.length || ownerAmount().costsToRecover>0 ? opening(botId)+' There is some cash-flow pressure. '+(overdues.length?overdues.length+' invoice(s) are overdue. ':'')+'Costs still to recover are '+money(ownerAmount().costsToRecover)+'.' : opening(botId)+' Cash flow looks healthy at the moment.';
         if(text.includes('invoice') || text.includes('payment')) return overdues.length ? opening(botId)+' Overdue accounts: '+overdues.map(i=>i.client).join(', ')+'.' : opening(botId)+' No overdue invoices right now.';
         return opening(botId)+' Owner-safe money is '+money(ownerAmount().owner)+', and outstanding money is '+money(state.invoices.filter(i=>i.status!=='PAID').reduce((s,i)=>s+i.total,0))+'.';
       }
       if(botId==='admin'){
+        if(text.includes('remember') || text.includes('goal')){ remember(botId,{conversationGoal:prompt.trim()}); return opening(botId)+' Got it. I’ll keep that in mind for this thread.'; }
         if(text.includes('organise') || text.includes('crm')) return opening(botId)+' Here is the cleanup pass: '+(followUps.length?'some prospects need tighter notes and follow-up. ':'')+(state.clients.some(c=>!c.phone)?'A few client records still need phone numbers. ':'')+'Templates and SOPs are the next thing I would standardise.';
         if(text.includes('what do you need from me')) return opening(botId)+' I need your approval on '+pendingApprovals().length+' item(s) and any missing details for new clients or campaigns.';
         return opening(botId)+' I’m keeping CRM, notes, templates, and blocked actions organised.';
       }
-      return 'I am ready.';
+      return opening(botId)+' I can help with that. '+conversationalQuestion(botId);
     }
     function askBot(botId,prompt){
       ensureBotChats();
@@ -464,9 +539,11 @@ const html = String.raw`<!doctype html>
     }
     function clearBotChat(botId){
       ensureBotChats();
+      ensureBotMemory();
       const bot=botById(botId);
       if(!confirm('Clear chat with '+bot.name+'? This only removes the conversation history for this bot.')) return;
       state.botChats[botId]=[{role:'bot',text:'Hi, I’m '+bot.name+'. '+bot.purpose+' I’m online and already watching the business.'}];
+      state.botMemory[botId]={lastTopic:'',lastClient:'',lastProspect:'',pendingQuestion:'',conversationGoal:'',notes:[]};
       logBotActivity(bot.name,'Chat cleared','Conversation history was cleared by the owner.');
       persist();
       render();
