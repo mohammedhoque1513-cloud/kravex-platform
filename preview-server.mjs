@@ -88,9 +88,14 @@ const html = String.raw`<!doctype html>
     .hero .muted { color:#dbeafe; }
     .hero h1 { font-size:56px; line-height:1.02; max-width:760px; }
     .hero-panel { position:relative; z-index:1; background:#ffffff12; border:1px solid #ffffff28; border-radius:18px; padding:24px; backdrop-filter:blur(12px); box-shadow:0 24px 80px #0005; }
-    .hero-panel .card { color:#07111f; }
-    .hero-panel .card .muted { color:#64748b; }
-    .hero-panel .card .stat { color:#0f172a; }
+    .hero-panel .card,
+    .hero-panel .card p,
+    .hero-panel .card h2,
+    .hero-panel .card b,
+    .hero-panel .card span { color:#07111f !important; }
+    .hero-panel .card .muted,
+    .hero-panel .card p.muted { color:#475569 !important; }
+    .hero-panel .card .stat { color:#0f172a !important; text-shadow:none !important; }
     .site-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
     .pricing-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
     .hero-actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:28px; }
