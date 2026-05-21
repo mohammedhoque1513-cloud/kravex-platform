@@ -146,6 +146,7 @@ const html = String.raw`<!doctype html>
       approvalActions:[],
       botActivity:[],
       activeBot:'ceo',
+      autopilot:{enabled:true,lastRun:'',mode:'Preview'},
       expenses:{adSpend:0,tools:0},
       activeClientEmail:'',
       settings:{name:'KRAVEX',vat:'',address:'',niches:['Dentists','Solicitors','Roofers','Aesthetic Clinics']}
@@ -310,12 +311,12 @@ const html = String.raw`<!doctype html>
     function ownerAmount(){ const paid=state.invoices.filter(i=>i.status==='PAID').reduce((s,i)=>s+i.subtotal,0); const vat=state.invoices.filter(i=>i.status==='PAID').reduce((s,i)=>s+i.vat,0); const adSpend=state.expenses?.adSpend||0; const tools=state.expenses?.tools||0; const costs=adSpend+tools; const grossOwner=Math.max(0,paid-costs); const deposited=state.ownerDeposits.reduce((s,d)=>s+d.amount,0); return {paid,vat,adSpend,tools,costs,grossOwner,deposited,owner:Math.max(0,grossOwner-deposited),costsToRecover:Math.max(0,costs-paid)}; }
     function ownerBreakdown(){ const o=ownerAmount(); const depositAccount=defaultDepositAccount(); return '<div class="card"><div class="lead-card-top"><h2>Owner available: '+money(o.owner)+'</h2><div class="toolbar" style="margin:0"><button class="btn secondary" onclick="openModal(\'deposit\')">Deposit</button><button class="btn secondary" onclick="openModal(\'depositSettings\')">Deposit Settings</button></div></div><p class="muted">This is paid retainer money available to the owner after operating costs and previous deposits. VAT is shown separately so it is not mistaken for owner money.</p>'+(depositAccount?'<p class="muted" style="margin-top:10px">Default deposit account: <b>'+depositAccount.name+'</b> · '+formatSortCode(depositAccount.sortCode)+' · '+maskAccountNumber(depositAccount.accountNumber)+' · <span class="badge">'+(depositAccount.verified?'VERIFIED':'PENDING')+'</span></p>':'<p class="muted" style="margin-top:10px">No deposit account saved yet. Add one in Deposit Settings.</p>')+'<div style="margin-top:12px"><div class="money-line"><span>Paid retainers ex VAT</span><b>'+money(o.paid)+'</b></div><div class="money-line"><span>VAT to set aside</span><b>'+money(o.vat)+'</b></div><div class="money-line"><span>Ad spend</span><b>'+money(o.adSpend)+'</b></div><div class="money-line"><span>Tools/software</span><b>'+money(o.tools)+'</b></div><div class="money-line"><span>Costs to recover</span><b>'+money(o.costsToRecover)+'</b></div><div class="money-line"><span>Already deposited</span><b>'+money(o.deposited)+'</b></div><div class="money-line"><span>Owner available now</span><b>'+money(o.owner)+'</b></div></div><p class="muted" style="margin-top:12px">Outstanding invoices are not counted until paid. Deposits reduce the owner amount left available inside KRAVEX.</p></div>'; }
     const botDefinitions = [
-      {id:'ceo',name:'CEO Bot',purpose:'Runs the company and tells you what matters today.'},
-      {id:'sales',name:'Sales Bot',purpose:'Finds prospects, drafts outreach, and prepares your calls.'},
-      {id:'delivery',name:'Lead Delivery Bot',purpose:'Monitors campaigns, lead quality, and delivery targets.'},
-      {id:'success',name:'Client Success Bot',purpose:'Keeps clients informed and flags churn risk.'},
-      {id:'cfo',name:'CFO Bot',purpose:'Tracks invoices, cash flow, VAT, and safe owner withdrawals.'},
-      {id:'admin',name:'Admin Bot',purpose:'Keeps CRM, templates, notes, and operations tidy.'}
+      {id:'ceo',name:'Atlas',title:'CEO Bot',purpose:'Runs the company and tells you what matters today.'},
+      {id:'sales',name:'Nova',title:'Sales Bot',purpose:'Finds prospects, drafts outreach, and prepares your calls.'},
+      {id:'delivery',name:'Pulse',title:'Lead Delivery Bot',purpose:'Monitors campaigns, lead quality, and delivery targets.'},
+      {id:'success',name:'Halo',title:'Client Success Bot',purpose:'Keeps clients informed and flags churn risk.'},
+      {id:'cfo',name:'Ledger',title:'CFO Bot',purpose:'Tracks invoices, cash flow, VAT, and safe owner withdrawals.'},
+      {id:'admin',name:'Quill',title:'Admin Bot',purpose:'Keeps CRM, templates, notes, and operations tidy.'}
     ];
     function botById(id){ return botDefinitions.find(bot=>bot.id===id) || botDefinitions[0]; }
     function parseUkDate(value){
@@ -355,7 +356,8 @@ const html = String.raw`<!doctype html>
       persist();
       render();
     }
-    function ensureBotChats(){ if(!state.botChats || typeof state.botChats!=='object') state.botChats={}; botDefinitions.forEach(bot=>{ if(!Array.isArray(state.botChats[bot.id])) state.botChats[bot.id]=[{role:'bot',text:bot.name+' online. '+bot.purpose}]; }); if(!state.activeBot) state.activeBot='ceo'; }
+    function botLabel(botId){ const bot=botById(botId); return bot.name+' ('+bot.title+')'; }
+    function ensureBotChats(){ if(!state.botChats || typeof state.botChats!=='object') state.botChats={}; botDefinitions.forEach(bot=>{ if(!Array.isArray(state.botChats[bot.id])) state.botChats[bot.id]=[{role:'bot',text:'Hi, I’m '+bot.name+'. '+bot.purpose+' I’m online and already watching the business.'}]; }); if(!state.activeBot) state.activeBot='ceo'; }
     ensureBotChats();
     function selectBot(id){ state.activeBot=id; persist(); render(); }
     function nextCallBrief(){
@@ -365,46 +367,87 @@ const html = String.raw`<!doctype html>
       if(client) return 'Next client call: '+client.business+'. They are at risk because delivery is '+client.delivered+'/'+client.target+(client.unpaid?' and an invoice is unpaid.':'.');
       return 'No urgent call prep right now. Use the time for outreach or client updates.';
     }
+    function opening(botId){
+      const bot=botById(botId);
+      const intros={
+        ceo:'Here is the straight view from the top.',
+        sales:'I’m on prospecting and follow-up.',
+        delivery:'I’m watching delivery quality and campaign health.',
+        success:'I’m looking after retention and client confidence.',
+        cfo:'I’m tracking cash, invoices, and what is genuinely safe to take out.',
+        admin:'I’m keeping the operating system tidy so things do not slip.'
+      };
+      return bot.name+': '+intros[botId];
+    }
+    function plainList(items, emptyText){
+      return items.length ? items.join(' ') : emptyText;
+    }
+    function runAutopilotCycle(){
+      if(!state.autopilot?.enabled) return;
+      const now=new Date();
+      const minuteBucket=now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate()+'-'+now.getHours()+'-'+Math.floor(now.getMinutes()/5);
+      if(state.autopilot.lastRun===minuteBucket) return;
+      state.autopilot.lastRun=minuteBucket;
+      const alerts=businessAlerts();
+      const tasks=clientTasks();
+      const overdues=overdueInvoicesData();
+      const risks=atRiskClientsData();
+      const weak=weakCampaignsData();
+      const followUps=followUpProspectsData();
+      if(overdues.length) logBotActivity('Ledger','Cash-flow warning',overdues[0].title+'. '+overdues[0].detail);
+      else if(weak.length) logBotActivity('Pulse','Campaign watch',weak[0].title+'. '+weak[0].detail);
+      else if(risks.length) logBotActivity('Halo','Client-risk watch',risks[0].business+' is on the watchlist at '+risks[0].delivered+'/'+risks[0].target+' delivered leads.');
+      else if(followUps.length) logBotActivity('Nova','Pipeline watch',followUps[0].title+' is ready for a follow-up.');
+      else if(tasks.length) logBotActivity('Atlas','Operations pulse',tasks[0].text);
+      if(alerts.length && Math.random()>0.6){
+        state.messages.unshift('Autopilot update: '+alerts[0].title+'.');
+        state.messages=state.messages.slice(0,20);
+      }
+      persist();
+    }
     function replyForBot(botId,prompt){
       const text=String(prompt||'').toLowerCase();
       const tasks=clientTasks();
       const alerts=businessAlerts();
       const risks=atRiskClientsData();
       const overdues=overdueInvoicesData();
+      const weak=weakCampaignsData();
+      const followUps=followUpProspectsData();
       if(botId==='ceo'){
-        if(text.includes('what should i do today')) return 'Today: 1) '+tasks.slice(0,3).map(t=>t.text).join(' 2) ') + '.';
-        if(text.includes('what needs my attention')) return alerts.length ? alerts.slice(0,3).map(a=>a.title).join(' | ') : 'Nothing urgent is flashing right now.';
-        if(text.includes('are clients happy') || text.includes('clients at risk')) return risks.length ? risks.map(c=>c.business+' ('+c.delivered+'/'+c.target+' leads)').join(', ') : 'Client delivery looks calm right now.';
-        if(text.includes('making money') || text.includes('money')) return 'Owner-safe money right now is '+money(ownerAmount().owner)+'. Outstanding invoices total '+money(state.invoices.filter(i=>i.status!=='PAID').reduce((s,i)=>s+i.total,0))+'.';
-        if(text.includes('broken') || text.includes('improve')) return alerts.length ? 'What looks broken: '+alerts.slice(0,4).map(a=>a.title).join('; ') : 'Nothing is obviously broken. I would improve sales volume and client updates next.';
-        return 'CEO view: focus on '+tasks[0].text+' and keep an eye on '+(alerts[0]?.title || 'steady client delivery')+'.';
+        if(text.includes('what should i do today')) return opening(botId)+' Today I’d keep it very simple. '+plainList(tasks.slice(0,3).map((t,i)=>(i+1)+'. '+t.text), 'There are no urgent tasks, so your best move is outreach and relationship calls.')+' You do not need to touch the admin clutter unless one of us escalates it.';
+        if(text.includes('what needs my attention')) return opening(botId)+' Right now the main things on your desk are: '+plainList(alerts.slice(0,4).map(a=>a.title+'.'), 'Nothing critical is flashing.') ;
+        if(text.includes('are clients happy') || text.includes('clients at risk')) return risks.length ? opening(botId)+' A few accounts need watching. '+risks.map(c=>c.business+' is at '+c.delivered+'/'+c.target+' leads'+(c.unpaid?', and there is also an unpaid invoice.':'.')).join(' ') : opening(botId)+' Clients look steady at the moment. No obvious churn signals are jumping out.';
+        if(text.includes('making money') || text.includes('money')) return opening(botId)+' Yes, and here is the clean number: owner-safe money is '+money(ownerAmount().owner)+'. Outstanding invoices sit at '+money(state.invoices.filter(i=>i.status!=='PAID').reduce((s,i)=>s+i.total,0))+', and VAT set-aside is '+money(ownerAmount().vat)+'.';
+        if(text.includes('broken') || text.includes('improve')) return alerts.length ? opening(botId)+' What looks broken or at least weak is this: '+alerts.slice(0,4).map(a=>a.title).join('; ')+'. If I had to improve one thing first, it would be '+(weak[0]?.title || followUps[0]?.title || 'top-of-funnel prospecting')+'.' : opening(botId)+' Nothing feels badly broken. The next improvement move is more outbound and tighter weekly client updates.';
+        if(text.includes('what do you need from me')) return opening(botId)+' I need you for '+pendingApprovals().length+' approval(s) and any live calls that need your voice. Everything else can stay with us.';
+        return opening(botId)+' Focus on '+tasks[0].text+' and keep one eye on '+(alerts[0]?.title || 'steady client delivery')+'.';
       }
       if(botId==='sales'){
-        if(text.includes('find me more clients')) return 'Best next targets: '+(state.settings.niches||[]).slice(0,4).join(', ')+'. I would build a fresh prospect list, draft outreach, and line up calls for you.';
-        if(text.includes('follow-up')) return followUpProspectsData().length ? 'Needs follow-up: '+followUpProspectsData().slice(0,5).map(p=>p.title+' ('+label(p.stage)+')').join(', ') : 'No prospect follow-ups are queued yet.';
-        if(text.includes('prepare me for my next call') || text.includes('next call')) return nextCallBrief();
-        return 'Sales queue: '+(followUpProspectsData().length ? followUpProspectsData().slice(0,3).map(p=>p.title).join(', ') : 'prospect list needs building')+'.';
+        if(text.includes('find me more clients')) return opening(botId)+' Best hunting ground right now is '+(state.settings.niches||[]).slice(0,4).join(', ')+'. I’d go niche by niche, build fresh prospect lists, prepare outreach, and only pull you in once replies turn into calls.';
+        if(text.includes('follow-up')) return followUps.length ? opening(botId)+' These are warm enough to push today: '+followUps.slice(0,5).map(p=>p.title+' ('+label(p.stage)+')').join(', ')+'.' : opening(botId)+' No proper follow-up queue exists yet, which usually means we need more pipeline volume.';
+        if(text.includes('prepare me for my next call') || text.includes('next call')) return opening(botId)+' '+nextCallBrief();
+        return opening(botId)+' Sales queue is '+(followUps.length ? followUps.slice(0,3).map(p=>p.title).join(', ') : 'a little too light, so I would start with prospect research and fresh outreach')+'.';
       }
       if(botId==='delivery'){
-        if(text.includes('broken') || text.includes('weak')) return weakCampaignsData().length ? weakCampaignsData().map(c=>c.title).join(', ') : 'No campaigns are currently flagged as weak.';
-        if(text.includes('lead') || text.includes('client')) return state.clients.length ? state.clients.map(c=>c.business+': '+deliveredForClient(c)+'/'+(c.target||0)).join(' | ') : 'No client delivery records yet.';
-        return weakCampaignsData().length ? 'Priority fix: '+weakCampaignsData()[0].title+'.' : 'Delivery looks stable right now.';
+        if(text.includes('broken') || text.includes('weak')) return weak.length ? opening(botId)+' The weak spots are '+weak.map(c=>c.title).join(', ')+'.' : opening(botId)+' No campaign is clearly under water right now.';
+        if(text.includes('lead') || text.includes('client')) return state.clients.length ? opening(botId)+' Delivery by client: '+state.clients.map(c=>c.business+' at '+deliveredForClient(c)+'/'+(c.target||0)).join(' | ')+'.' : opening(botId)+' We do not have client delivery records yet.';
+        return weak.length ? opening(botId)+' First fix would be '+weak[0].title+'.' : opening(botId)+' Delivery looks steady right now.';
       }
       if(botId==='success'){
-        if(text.includes('clients at risk') || text.includes('unhappy')) return risks.length ? risks.map(c=>c.business+' ('+c.delivered+'/'+c.target+' leads'+(c.unpaid?', unpaid invoice':'')+')').join(', ') : 'No clients are clearly at risk right now.';
-        if(text.includes('need to call')) return risks.length ? 'You should call '+risks[0].business+' first.' : 'No urgent client rescue call is needed.';
-        return risks.length ? 'Client success watchlist: '+risks.map(c=>c.business).join(', ') : 'Clients look steady from a retention point of view.';
+        if(text.includes('clients at risk') || text.includes('unhappy')) return risks.length ? opening(botId)+' Watch these closely: '+risks.map(c=>c.business+' at '+c.delivered+'/'+c.target+' leads'+(c.unpaid?', plus an unpaid invoice':'')).join(', ')+'.' : opening(botId)+' No client is waving a red flag at the moment.';
+        if(text.includes('need to call')) return risks.length ? opening(botId)+' You should call '+risks[0].business+' first. That one has the highest chance of turning into a save call.' : opening(botId)+' No urgent client rescue call is needed right now.';
+        return risks.length ? opening(botId)+' Retention watchlist is '+risks.map(c=>c.business).join(', ')+'.' : opening(botId)+' Clients look calm from a retention point of view.';
       }
       if(botId==='cfo'){
-        if(text.includes('how much money can i take out') || text.includes('owner money')) return 'You can safely take '+money(ownerAmount().owner)+' right now. VAT set-aside is '+money(ownerAmount().vat)+'.';
-        if(text.includes('cash flow') || text.includes('risky')) return overdues.length || ownerAmount().costsToRecover>0 ? 'Cash flow risk exists: '+(overdues.length?overdues.length+' overdue invoice(s). ':'')+'Costs to recover: '+money(ownerAmount().costsToRecover)+'.' : 'Cash flow looks healthy right now.';
-        if(text.includes('invoice') || text.includes('payment')) return overdues.length ? 'Overdue: '+overdues.map(i=>i.client).join(', ') : 'No overdue invoices right now.';
-        return 'Finance view: owner-safe money '+money(ownerAmount().owner)+', outstanding '+money(state.invoices.filter(i=>i.status!=='PAID').reduce((s,i)=>s+i.total,0))+'.';
+        if(text.includes('how much money can i take out') || text.includes('owner money')) return opening(botId)+' You can safely take '+money(ownerAmount().owner)+' right now. I would leave VAT set-aside untouched at '+money(ownerAmount().vat)+'.';
+        if(text.includes('cash flow') || text.includes('risky')) return overdues.length || ownerAmount().costsToRecover>0 ? opening(botId)+' There is some cash-flow pressure. '+(overdues.length?overdues.length+' invoice(s) are overdue. ':'')+'Costs still to recover are '+money(ownerAmount().costsToRecover)+'.' : opening(botId)+' Cash flow looks healthy at the moment.';
+        if(text.includes('invoice') || text.includes('payment')) return overdues.length ? opening(botId)+' Overdue accounts: '+overdues.map(i=>i.client).join(', ')+'.' : opening(botId)+' No overdue invoices right now.';
+        return opening(botId)+' Owner-safe money is '+money(ownerAmount().owner)+', and outstanding money is '+money(state.invoices.filter(i=>i.status!=='PAID').reduce((s,i)=>s+i.total,0))+'.';
       }
       if(botId==='admin'){
-        if(text.includes('organise') || text.includes('crm')) return 'Admin sweep: '+(followUpProspectsData().length?'prospects need notes/follow-up. ':'')+(state.clients.some(c=>!c.phone)?'Some client records need phone numbers. ':'')+'Templates and SOPs can be standardised next.';
-        if(text.includes('what do you need from me')) return 'I need approval on '+pendingApprovals().length+' item(s) and any missing business details for new clients.';
-        return 'Admin queue: keep CRM tidy, fill missing records, and approve blocked bot actions.';
+        if(text.includes('organise') || text.includes('crm')) return opening(botId)+' Here is the cleanup pass: '+(followUps.length?'some prospects need tighter notes and follow-up. ':'')+(state.clients.some(c=>!c.phone)?'A few client records still need phone numbers. ':'')+'Templates and SOPs are the next thing I would standardise.';
+        if(text.includes('what do you need from me')) return opening(botId)+' I need your approval on '+pendingApprovals().length+' item(s) and any missing details for new clients or campaigns.';
+        return opening(botId)+' I’m keeping CRM, notes, templates, and blocked actions organised.';
       }
       return 'I am ready.';
     }
@@ -423,9 +466,9 @@ const html = String.raw`<!doctype html>
     function botSummaryCard(bot){
       const queue=bot.id==='ceo'?clientTasks().length:bot.id==='sales'?followUpProspectsData().length:bot.id==='delivery'?weakCampaignsData().length:bot.id==='success'?atRiskClientsData().length:bot.id==='cfo'?overdueInvoicesData().length:state.clients.filter(c=>!c.phone || !c.contact).length;
       const mood=queue===0?'On track':queue<3?'Watching':'Needs attention';
-      return '<button class="card" style="text-align:left" onclick="selectBot(\''+bot.id+'\')"><div class="lead-card-top"><div><h2>'+bot.name+'</h2><p class="muted">'+bot.purpose+'</p></div><span class="badge">'+mood+'</span></div><div class="money-line" style="margin-top:12px"><span>Open items</span><b>'+queue+'</b></div></button>';
+      return '<button class="card" style="text-align:left" onclick="selectBot(\''+bot.id+'\')"><div class="lead-card-top"><div><h2>'+bot.name+'</h2><p class="muted">'+bot.title+' · '+bot.purpose+'</p></div><span class="badge">'+mood+'</span></div><div class="money-line" style="margin-top:12px"><span>Open items</span><b>'+queue+'</b></div><div class="money-line"><span>Autonomy</span><b>24/7 mode</b></div></button>';
     }
-    function ai(){ ensureBotChats(); const bot=botById(state.activeBot || 'ceo'); const history=(state.botChats[bot.id]||[]).slice(-8); const suggestions=['What should I do today?','Find me more clients.','Who needs a follow-up?','Which clients are at risk?','How much money can I take out?','Prepare me for my next call.','What is broken in the business?','What do you need from me?']; return '<div class="title"><div><h1>Ask CEO Bot</h1><p class="muted">Digital employees run the day-to-day. You step in for calls, approvals, and major decisions.</p></div><div class="toolbar"><button class="btn" onclick="askBot(\'ceo\', \'What should I do today?\')">Daily Brief</button><button class="btn secondary" onclick="page=\'approvals\';render()">Approval Centre</button></div></div><div class="grid cards">'+[['Bots online',botDefinitions.length],['Tasks today',clientTasks().length],['Alerts',businessAlerts().length],['Approvals waiting',pendingApprovals().length]].map(x=>'<div class="card"><p class="muted">'+x[0]+'</p><p class="stat">'+x[1]+'</p></div>').join('')+'</div><div class="grid two" style="margin-top:18px"><div class="grid" style="gap:14px">'+botDefinitions.map(botSummaryCard).join('')+'</div><div class="card"><div class="lead-card-top"><div><h2>'+bot.name+'</h2><p class="muted">'+bot.purpose+'</p></div><span class="badge">Owner command centre</span></div><div class="grid" style="gap:10px;margin-top:16px">'+history.map(m=>'<div class="card" style="padding:14px;background:'+(m.role==='owner'?'#eff6ff':'#f8fafc')+'"><p class="muted" style="margin:0 0 6px">'+(m.role==='owner'?'You':bot.name)+'</p><p>'+m.text+'</p></div>').join('')+'</div><form onsubmit="sendBotPrompt(event)" style="margin-top:16px"><input name="prompt" placeholder="Message '+bot.name+'..." required><div class="toolbar" style="margin-top:12px"><button class="btn">Send</button></div></form><div class="toolbar" style="margin-top:10px">'+suggestions.map(q=>'<button class="btn secondary" type="button" onclick="askBot(\''+bot.id+'\', \''+q.replace(/'/g,"\\'")+'\')">'+q+'</button>').join('')+'</div></div></div>'; }
+    function ai(){ ensureBotChats(); const bot=botById(state.activeBot || 'ceo'); const history=(state.botChats[bot.id]||[]).slice(-8); const suggestions=['What should I do today?','Find me more clients.','Who needs a follow-up?','Which clients are at risk?','How much money can I take out?','Prepare me for my next call.','What is broken in the business?','What do you need from me?']; return '<div class="title"><div><h1>Ask CEO Bot</h1><p class="muted">Digital employees run the day-to-day. You step in for calls, approvals, and major decisions.</p></div><div class="toolbar"><button class="btn" onclick="askBot(\'ceo\', \'What should I do today?\')">Daily Brief</button><button class="btn secondary" onclick="page=\'approvals\';render()">Approval Centre</button></div></div><div class="grid cards">'+[['Bots online',botDefinitions.length],['Tasks today',clientTasks().length],['Alerts',businessAlerts().length],['Approvals waiting',pendingApprovals().length]].map(x=>'<div class="card"><p class="muted">'+x[0]+'</p><p class="stat">'+x[1]+'</p></div>').join('')+'</div><div class="grid two" style="margin-top:18px"><div class="grid" style="gap:14px"><div class="card client-hero"><div class="lead-card-top"><div><h2>Autopilot</h2><p class="muted">Bots continue cycling through sales, delivery, finance, and client watch logic while this control room is open.</p></div><span class="badge">Enabled</span></div><div class="money-line" style="margin-top:12px;border-color:#ffffff22"><span>Mode</span><b>'+(state.autopilot?.mode || 'Preview')+'</b></div><div class="money-line" style="border-color:#ffffff22"><span>Last cycle</span><b>'+(state.autopilot?.lastRun || 'Pending')+'</b></div><div class="money-line" style="border-color:#ffffff22"><span>Escalations</span><b>'+pendingApprovals().length+'</b></div><p class="muted" style="margin-top:12px">Real always-on automation needs a hosted backend worker. This preview keeps the operating logic alive while you are in the app.</p></div>'+botDefinitions.map(botSummaryCard).join('')+'</div><div class="card"><div class="lead-card-top"><div><h2>'+bot.name+'</h2><p class="muted">'+bot.title+' · '+bot.purpose+'</p></div><span class="badge">Owner command centre</span></div><div class="grid" style="gap:10px;margin-top:16px">'+history.map(m=>'<div class="card" style="padding:14px;background:'+(m.role==='owner'?'#eff6ff':'#f8fafc')+'"><p class="muted" style="margin:0 0 6px">'+(m.role==='owner'?'You':bot.name)+'</p><p>'+m.text+'</p></div>').join('')+'</div><form onsubmit="sendBotPrompt(event)" style="margin-top:16px"><input name="prompt" placeholder="Message '+bot.name+'..." required><div class="toolbar" style="margin-top:12px"><button class="btn">Send</button></div></form><div class="toolbar" style="margin-top:10px">'+suggestions.map(q=>'<button class="btn secondary" type="button" onclick="askBot(\''+bot.id+'\', \''+q.replace(/'/g,"\\'")+'\')">'+q+'</button>').join('')+'</div></div></div>'; }
     function approvals(){ const items=pendingApprovals(); return '<div class="title"><div><h1>Approval Centre</h1><p class="muted">Bots can prepare work, but they stop here before anything commercially risky happens.</p></div><button class="btn secondary" onclick="page=\'ai\';render()">Back to AI OS</button></div><div class="grid cards">'+[['Waiting for approval',items.length],['Final proposals',items.filter(i=>i.type==='Proposal').length],['Finance actions',items.filter(i=>i.bot==='CFO Bot').length],['Client-risk actions',items.filter(i=>i.bot==='Client Success Bot').length]].map(x=>'<div class="card"><p class="muted">'+x[0]+'</p><p class="stat">'+x[1]+'</p></div>').join('')+'</div>'+(items.length?'<div class="grid" style="gap:16px;margin-top:18px">'+items.map(item=>'<div class="card"><div class="lead-card-top"><div><h2>'+item.title+'</h2><p class="muted">'+item.bot+' · '+item.type+'</p></div><span class="badge">'+item.risk+'</span></div><p style="margin-top:12px">'+item.detail+'</p><div class="toolbar" style="margin-top:16px"><button class="btn" onclick="decideApproval(\''+item.id+'\', \'approved\')">Approve</button><button class="btn secondary" onclick="decideApproval(\''+item.id+'\', \'rejected\')">Reject</button></div></div>').join('')+'</div>':liveEmpty('No approvals are waiting right now.')); }
     function activity(){ return '<div class="title"><div><h1>Bot Activity Logs</h1><p class="muted">A clear trail of what the digital employees have done or asked for.</p></div><button class="btn secondary" onclick="page=\'ai\';render()">Ask CEO Bot</button></div>'+(state.botActivity.length?table(['When','Bot','Action','Detail'],state.botActivity.map(item=>[item.date,item.bot,item.title,item.detail])):liveEmpty('No bot activity has been recorded yet. Start using the AI OS and the log will fill in.')); }
     function dashboard(){ const mrr=state.clients.filter(c=>c.status==='ACTIVE').reduce((s,c)=>s+c.retainer,0); const invoiced=state.invoices.reduce((s,i)=>s+i.total,0); const ownerInfo=ownerAmount(); const alerts=businessAlerts(); const tasks=clientTasks(); return '<div class="title"><div><h1>KRAVEX Dashboard</h1><p class="muted">Your digital employees run the detail. You focus on calls, approvals, and decisions.</p></div><div class="toolbar"><button class="btn" onclick="page=\'ai\';render()">Ask CEO Bot</button><button class="btn secondary" onclick="page=\'approvals\';render()">Approval Centre</button><button class="btn secondary" onclick="openModal(\'lead\')">Log Lead</button></div></div><div class="grid cards">'+[['Total MRR',money(mrr)],['Total invoiced inc VAT',money(invoiced)],['Owner available',money(ownerInfo.owner)],['Bot alerts',alerts.length]].map(x=>'<div class="card"><p class="muted">'+x[0]+'</p><p class="stat">'+x[1]+'</p></div>').join('')+'</div><div class="grid two" style="margin-top:18px"><div class="card"><h2>What you should do today</h2>'+(tasks.length?tasks.slice(0,6).map((task,index)=>'<div class="money-line"><span>'+(index+1)+'. '+task.text+'</span><b>'+task.owner+'</b></div>').join(''): '<p class="muted">No urgent tasks right now.</p>')+'</div><div class="card"><h2>What needs attention</h2>'+(alerts.length?alerts.slice(0,6).map(alert=>'<div class="money-line"><span>'+alert.title+'</span><b>'+alert.bot+'</b></div>').join(''):'<p class="muted">Nothing urgent is flashing right now.</p>')+'</div></div><div class="grid two" style="margin-top:18px"><div><h2>Client performance</h2>'+(state.clients.length?table(['Client','Retainer','Leads Delivered','Invoice Status'],clientRows()):liveEmpty('No real clients entered yet. Add a client to start tracking real MRR.'))+'</div>'+ownerBreakdown()+'</div><div class="grid two" style="margin-top:18px"><div class="card"><h2>Digital employee status</h2><div class="money-line"><span>CEO Bot</span><b>'+clientTasks().length+' open items</b></div><div class="money-line"><span>Sales Bot</span><b>'+followUpProspectsData().length+' prospects to work</b></div><div class="money-line"><span>Lead Delivery Bot</span><b>'+weakCampaignsData().length+' campaign issues</b></div><div class="money-line"><span>Client Success Bot</span><b>'+atRiskClientsData().length+' client risks</b></div><div class="money-line"><span>CFO Bot</span><b>'+overdueInvoicesData().length+' overdue invoices</b></div><div class="money-line"><span>Admin Bot</span><b>'+pendingApprovals().length+' items blocked for approval</b></div></div><div class="card"><h2>Bot notifications</h2>'+(state.botActivity.length?state.botActivity.slice(0,5).map(item=>'<p style="margin:10px 0"><b>'+item.bot+':</b> '+item.title+'<br><span class="muted">'+item.detail+'</span></p>').join(''):'<p class="muted">The bots will start logging activity as you use the system.</p>')+'</div></div>'; }
@@ -526,8 +569,19 @@ const html = String.raw`<!doctype html>
     window.addEventListener('beforeunload', () => {
       try { persist(); } catch {}
     });
-      runAutoBilling();
-      safeRender();
+    runAutoBilling();
+    runAutopilotCycle();
+    setInterval(() => {
+      try {
+        runAutopilotCycle();
+        if(state.user==='ADMIN' && ['dashboard','ai','activity','approvals'].includes(page)){
+          safeRender();
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }, 30000);
+    safeRender();
   </script>
 </body>
 </html>`;
