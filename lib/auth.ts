@@ -5,6 +5,7 @@ import { verify } from "otplib";
 import { prisma } from "@/lib/db";
 import { listLocal } from "@/lib/local-store";
 import { logSecurityEvent } from "@/lib/security-events";
+import { decryptSecret } from "@/lib/encryption";
 
 function demoUsers() {
   const adminPassword = process.env.DEMO_ADMIN_PASSWORD;
@@ -68,7 +69,7 @@ export const authOptions: NextAuthOptions = {
               return null;
             }
             if (user.twoFactorEnabled) {
-              const validCode = Boolean(user.twoFactorSecret && code && verify({ token: code, secret: user.twoFactorSecret }));
+              const validCode = Boolean(user.twoFactorSecret && code && verify({ token: code, secret: decryptSecret(user.twoFactorSecret) }));
               if (!validCode) {
                 await logSecurityEvent({ type: "LOGIN_FAILURE", severity: "HIGH", email, userId: user.id, description: "Valid password submitted without a valid 2FA code." });
                 return null;
