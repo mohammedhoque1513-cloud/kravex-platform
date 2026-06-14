@@ -1,0 +1,2 @@
+import { BrandLogo } from "@/components/shared/ui";
+export default function Activate(){return <main className="flex min-h-screen items-center justify-center bg-kravex-black p-5"><form className="w-full max-w-md rounded-lg border border-kravex-gold/60 bg-kravex-card p-8"><BrandLogo/><h1 className="mt-8 font-heading text-4xl">Welcome to KRAVEX</h1><input type="password" placeholder="Set password" className="mt-6 w-full rounded bg-black px-4 py-3"/><button className="mt-6 w-full rounded bg-kravex-gold px-4 py-3 font-bold text-black">Activate Account</button></form></main>}

@@ -1,0 +1,1 @@
+import { json, prisma, readJson, requireRole } from "@/lib/api"; export async function POST(req:Request,{params}:any){const auth=await requireRole("ADMIN"); if('error'in auth) return auth.error; const b=await readJson(req as any); return json(await prisma.prospectActivity.create({data:{prospectId:params.id,type:b.type||"NOTE",note:b.note||"Activity logged"}}),201)}

@@ -1,0 +1,1 @@
+import { json, prisma, requireRole } from "@/lib/api"; export async function GET(_:Request,{params}:any){const auth=await requireRole("CLIENT"); if('error'in auth) return auth.error; return json(await prisma.invoice.findFirst({where:{id:params.id,clientId:(auth.user as any).clientId},include:{lineItems:true,payments:true}}))}
