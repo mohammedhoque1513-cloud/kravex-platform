@@ -28,6 +28,7 @@ jobs:
       NEXTAUTH_SECRET: ci-only-secret-change-for-production
       NEXTAUTH_URL: http://127.0.0.1:3000
       NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
+      TOTP_ENCRYPTION_KEY: ci-only-totp-encryption-key
       DISABLE_LOCAL_FALLBACK: "true"
 
     steps:
