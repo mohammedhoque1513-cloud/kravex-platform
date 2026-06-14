@@ -1,0 +1,494 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  passwordHash  String
+  role          Role      @default(CLIENT)
+  clientId      String?
+  client        Client?   @relation(fields: [clientId], references: [id])
+  isActive      Boolean   @default(true)
+  lastLogin     DateTime?
+  stripeCustomerId String?
+  cardBrand     String?
+  cardLast4     String?
+  cardExpiry    String?
+  twoFactorSecret String?
+  twoFactorEnabled Boolean @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  @@index([role])
+  @@index([clientId])
+  @@index([deletedAt])
+}
+
+enum Role {
+  ADMIN
+  CLIENT
+}
+
+model Prospect {
+  id              String            @id @default(uuid())
+  businessName    String
+  contactName     String?
+  email           String?
+  phone           String?
+  website         String?
+  linkedinUrl     String?
+  niche           String?
+  city            String?
+  region          String?
+  stage           ProspectStage     @default(NEW_LEAD)
+  estimatedValue  Int               @default(0)
+  notes           String?
+  followUpDate    DateTime?
+  activities      ProspectActivity[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  deletedAt       DateTime?
+
+  @@index([stage])
+  @@index([city])
+  @@index([niche])
+  @@index([followUpDate])
+  @@index([deletedAt])
+}
+
+enum ProspectStage {
+  NEW_LEAD
+  CONTACTED
+  CALL_BOOKED
+  PROPOSAL_SENT
+  NEGOTIATING
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+model ProspectActivity {
+  id          String    @id @default(uuid())
+  prospectId  String
+  prospect    Prospect  @relation(fields: [prospectId], references: [id])
+  type        ActivityType
+  note        String
+  createdAt   DateTime  @default(now())
+}
+
+enum ActivityType {
+  CALL
+  EMAIL
+  MEETING
+  NOTE
+  PROPOSAL
+  FOLLOW_UP
+}
+
+model Client {
+  id              String    @id @default(uuid())
+  businessName    String
+  contactName     String
+  email           String
+  phone           String?
+  website         String?
+  niche           String?
+  city            String?
+  region          String?
+  retainerAmount  Int
+  leadTarget      Int
+  contractStart   DateTime
+  contractEnd     DateTime?
+  status          ClientStatus @default(ACTIVE)
+  convertedFrom   String?
+  notes           String?
+  stripeCustomerId String?
+  cardBrand       String?
+  cardLast4       String?
+  cardExpiry      String?
+  users           User[]
+  leads           Lead[]
+  invoices        Invoice[]
+  payments        Payment[]
+  messages        Message[]
+  campaigns       Campaign[]
+  reports         Report[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  @@index([status])
+  @@index([city])
+  @@index([niche])
+  @@index([deletedAt])
+}
+
+enum ClientStatus {
+  ACTIVE
+  PAUSED
+  CHURNED
+}
+
+model Campaign {
+  id               String    @id @default(uuid())
+  clientId         String
+  client           Client    @relation(fields: [clientId], references: [id])
+  name             String
+  niche            String?
+  platform         Platform
+  status           CampaignStatus @default(DRAFT)
+  prospectsCount   Int       @default(0)
+  emailsSent       Int       @default(0)
+  openRate         Float     @default(0)
+  replyRate        Float     @default(0)
+  positiveReplies  Int       @default(0)
+  callsBooked      Int       @default(0)
+  leadsGenerated   Int       @default(0)
+  monthlyBudget    Int       @default(0)
+  amountSpent      Int       @default(0)
+  startDate        DateTime?
+  endDate          DateTime?
+  notes            String?
+  leads            Lead[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  @@index([clientId])
+  @@index([status])
+  @@index([platform])
+  @@index([deletedAt])
+}
+
+enum Platform {
+  META_ADS
+  GOOGLE_ADS
+  COLD_EMAIL
+  LINKEDIN
+  REFERRAL
+  OTHER
+}
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+model Lead {
+  id            String      @id @default(uuid())
+  clientId      String
+  client        Client      @relation(fields: [clientId], references: [id])
+  campaignId    String?
+  campaign      Campaign?   @relation(fields: [campaignId], references: [id])
+  leadName      String
+  businessName  String?
+  email         String?
+  phone         String?
+  source        LeadSource
+  quality       LeadQuality
+  status        LeadStatus  @default(NEW)
+  notes         String?
+  clientNotes   String?
+  deliveredAt   DateTime    @default(now())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+
+  @@index([clientId, deliveredAt])
+  @@index([campaignId])
+  @@index([quality])
+  @@index([source])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+enum LeadSource {
+  META_AD
+  GOOGLE_AD
+  COLD_EMAIL
+  LINKEDIN
+  REFERRAL
+  OTHER
+}
+enum LeadQuality {
+  HOT
+  WARM
+  COLD
+}
+enum LeadStatus {
+  NEW
+  CONTACTED
+  MEETING_BOOKED
+  CONVERTED
+  NOT_INTERESTED
+  NO_RESPONSE
+}
+
+model Invoice {
+  id             String        @id @default(uuid())
+  clientId       String
+  client         Client        @relation(fields: [clientId], references: [id])
+  invoiceNumber  String        @unique
+  invoiceDate    DateTime
+  dueDate        DateTime
+  subtotal       Int
+  vatRate        Float         @default(20)
+  vatAmount      Int
+  total          Int
+  status         InvoiceStatus @default(DRAFT)
+  notes          String?
+  pdfUrl         String?
+  sentAt         DateTime?
+  paidAt         DateTime?
+  lineItems      InvoiceLineItem[]
+  payments       Payment[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  deletedAt      DateTime?
+
+  @@index([clientId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([deletedAt])
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+model InvoiceLineItem {
+  id           String   @id @default(uuid())
+  invoiceId    String
+  invoice      Invoice  @relation(fields: [invoiceId], references: [id])
+  description  String
+  quantity     Int      @default(1)
+  unitAmount   Int
+  totalAmount  Int
+  createdAt    DateTime @default(now())
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  invoiceId     String
+  invoice       Invoice       @relation(fields: [invoiceId], references: [id])
+  clientId      String
+  client        Client        @relation(fields: [clientId], references: [id])
+  amount        Int
+  paymentDate   DateTime
+  paymentMethod PaymentMethod
+  stripeId      String?       @unique
+  reference     String?
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([clientId])
+  @@index([invoiceId])
+  @@index([paymentDate])
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  CARD
+  DIRECT_DEBIT
+  OTHER
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id])
+  senderId  String
+  content   String
+  isRead    Boolean  @default(false)
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+
+  @@index([clientId, createdAt])
+  @@index([isRead])
+}
+
+model LeadForm {
+  id           String   @id @default(uuid())
+  name         String
+  businessName String?
+  email        String
+  phone        String
+  service      String
+  message      String?
+  source       String?
+  ipAddress    String?
+  isContacted  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@index([source])
+  @@index([createdAt])
+  @@index([isContacted])
+}
+
+model Report {
+  id              String   @id @default(uuid())
+  clientId        String
+  client          Client   @relation(fields: [clientId], references: [id])
+  reportMonth     DateTime
+  leadsDelivered  Int      @default(0)
+  leadsTarget     Int      @default(0)
+  hotLeads        Int      @default(0)
+  warmLeads       Int      @default(0)
+  coldLeads       Int      @default(0)
+  convertedLeads  Int      @default(0)
+  revenueBilled   Int      @default(0)
+  pdfUrl          String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Settings {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+}
+
+model MoneyVault {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  name        String
+  percentage  Float
+  balance     Int      @default(0)
+  description String?
+  isOwnerPay  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model MoneyLedgerEntry {
+  id          String   @id @default(uuid())
+  paymentId   String?
+  invoiceId   String?
+  vaultKey    String?
+  type        MoneyLedgerType
+  amount      Int
+  status      MoneyMovementStatus @default(PENDING)
+  reference   String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  clearedAt   DateTime?
+}
+
+model ReconciliationRun {
+  id          String   @id @default(uuid())
+  status      JobStatus
+  checkedAt   DateTime @default(now())
+  summary     String
+  createdAt   DateTime @default(now())
+}
+
+model BackupRun {
+  id          String   @id @default(uuid())
+  status      JobStatus
+  target      String
+  summary     String
+  createdAt   DateTime @default(now())
+}
+
+enum JobStatus {
+  SUCCESS
+  FAILED
+}
+
+enum MoneyLedgerType {
+  PAYMENT_RECEIVED
+  VAULT_ALLOCATION
+  OWNER_WITHDRAWAL_REQUEST
+  BANK_PAYOUT
+  REFUND
+  ADJUSTMENT
+}
+
+enum MoneyMovementStatus {
+  PENDING
+  AVAILABLE
+  PAID_OUT
+  FAILED
+  CANCELLED
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  email     String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+}
+
+model ActivationToken {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+}
+
+model LoginAttempt {
+  id        String   @id @default(uuid())
+  email     String
+  ipAddress String?
+  success   Boolean
+  createdAt DateTime @default(now())
+}
+
+model SecurityEvent {
+  id          String            @id @default(uuid())
+  type        SecurityEventType
+  severity    SecuritySeverity  @default(LOW)
+  source      String?
+  email       String?
+  ipAddress   String?
+  userId      String?
+  description String
+  metadata    String?
+  resolvedAt  DateTime?
+  createdAt   DateTime          @default(now())
+
+  @@index([type])
+  @@index([severity])
+  @@index([ipAddress])
+  @@index([createdAt])
+}
+
+enum SecurityEventType {
+  RATE_LIMIT
+  SCAM_PATTERN
+  DISPOSABLE_EMAIL
+  STRIPE_RISK
+  OVERPAYMENT
+  LOGIN_FAILURE
+  WEBHOOK_FAILURE
+  DEPENDENCY_ALERT
+  OTHER
+}
+
+enum SecuritySeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+

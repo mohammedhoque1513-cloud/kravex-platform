@@ -1,0 +1,1 @@
+import { json, prisma, requireRole } from "@/lib/api"; export async function GET(){const auth=await requireRole("ADMIN"); if('error'in auth) return auth.error; return json({clients:await prisma.client.count(),leads:await prisma.lead.count(),mrr:250000})}

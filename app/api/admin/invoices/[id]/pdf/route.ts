@@ -1,0 +1,1 @@
+import { json, requireRole } from "@/lib/api"; export async function GET(){const auth=await requireRole("ADMIN"); if('error'in auth) return auth.error; return json({pdfUrl:null,message:"PDF generation is wired for Puppeteer/Vercel Blob once production credentials are configured."})}

@@ -1,146 +1,71 @@
-# KRAVEX
+# KRAVEX Platform
 
-Internal CRM, client portal, campaign tracker, outreach manager, invoicing, and reporting platform for a UK lead generation agency.
+KRAVEX is a Next.js 14 lead generation platform with a public marketing site, admin portal, client portal, PostgreSQL schema, Stripe payments, Resend email, PDF/storage hooks, scheduled jobs, money-vault ledger logic and local fallbacks for development.
 
-## Tech Stack
+## Local Access
 
-- React, Vite, Tailwind CSS, Recharts, `@hello-pangea/dnd`
-- Node.js, Express, JWT auth, bcrypt
-- PostgreSQL with Prisma ORM
-- PDFKit invoice export
+Demo accounts are enabled only in development and are not shown on the login screen or public pages. Use the local seed/auth files when working on this machine, and remove development fallback accounts before production launch.
 
-## Setup
+## Lead Intake
 
-1. Install dependencies:
+- Home page lead form: public, no account needed, source `HOME_PAGE`.
+- Admin dashboard phone form: used by Emdadul during calls, source `PHONE_CALL`.
+- Both forms use the same `/api/lead-form` route.
+- Public submissions email KRAVEX and send an auto-reply.
+- Phone-call submissions create a prospect and notify KRAVEX only.
+- Protections: Zod validation, UK phone validation, honeypot, 3/hour/IP rate limit, disposable email blocking, suspicious link blocking and scam phrase blocking.
 
-   ```bash
-   npm run install:all
-   ```
+## Scaling
 
-2. Copy environment placeholders:
+- Vercel region: London `lhr1`.
+- PostgreSQL indexes are added for client/date/status-heavy tables.
+- Redis support is available through `REDIS_URL`.
+- BullMQ queues are available for emails, PDFs, reconciliation and backups.
+- Local development uses in-memory/local fallbacks when Redis/PostgreSQL are not connected.
 
-   ```bash
-   cp server/.env.example server/.env
-   cp client/.env.example client/.env
-   ```
+## Security
 
-3. Update `server/.env` with your PostgreSQL connection string and JWT secret.
+Active in code:
 
-4. Create the database schema and seed data:
+- Role-based admin/client route protection.
+- Protected API routes.
+- Security headers and CSP in `next.config.mjs`.
+- HSTS enabled for HTTPS production.
+- Stripe tokenisation model: no full card numbers stored.
+- No public file uploads.
+- Security event table for rate limits, scam patterns, Stripe risk and operational alerts.
 
-   ```bash
-   npm run prisma:migrate
-   npm run prisma:seed
-   ```
+Production services that must be connected outside this repository:
 
-5. Run the app:
+- Cloudflare DNS, WAF, bot protection, DDoS protection and edge rate limits.
+- Stripe live keys, Radar rules, webhook signing and verified payout bank account.
+- Railway PostgreSQL.
+- Redis provider for caching and queues.
+- Resend verified domain with SPF, DKIM and DMARC.
+- Companies House API for business verification.
+- Sentry and uptime monitoring.
+- Snyk or audit-ci in CI for dependency scanning.
+- reCAPTCHA v3 keys if you want Google-backed bot scoring in addition to local controls.
 
-   ```bash
-   npm run dev
-   ```
+## Money Handling
 
-The API runs on `http://localhost:5000` and the web app runs on `http://localhost:5173`.
+Client payments are processed by Stripe. KRAVEX records internal ledger allocations:
 
-## Seed Logins
+- 30% tax reserve
+- 5% insurance
+- 20% operations
+- 10% growth
+- 35% owner pay
 
-- Admin: `admin@kravex.co.uk` / `Password123!`
-- Client: `owner@brightsmile.co.uk` / `Password123!`
+These are accounting buckets, not separate protected bank accounts. Real transfers happen from Stripe to the verified business bank account, then owner withdrawals should only be made after cleared funds and accountant-approved tax allocation.
 
-## Deployment Notes
+## Commands
 
-The project is structured for a split deployment:
-
-- `client/` as the public website and app frontend
-- `server/` as the Express API
-- PostgreSQL as the production database
-
-### Render
-
-A starter [`render.yaml`](</C:/Users/emdad/OneDrive/Documents/New project/render.yaml>) is included for:
-
-- `kravex-api` as a Node web service
-- `kravex-web` as a static site
-- `kravex-db` as a managed Render PostgreSQL database
-
-Render will provision the database connection string and JWT secret from the Blueprint.
-
-Set these environment variables before going live:
-
-- `CLIENT_URL`
-- `VITE_API_URL`
-- `NODE_ENV=production`
-- `KRAVEX_USE_EMBEDDED_DB=false`
-- `KRAVEX_SEED_ON_BOOT=false`
-
-After deployment:
-
-1. Point the frontend custom domain to `kravex.co.uk`
-2. Point the API to a subdomain such as `api.kravex.co.uk`
-3. Set `CLIENT_URL=https://kravex.co.uk`
-4. Set `VITE_API_URL=https://api.kravex.co.uk/api`
-
-Production note:
-
-- the embedded Windows database is only for local development
-- on Render, use a managed PostgreSQL instance and keep demo seeding disabled
-
-### Railway
-
-Deploy `/server` as the web service, set `DATABASE_URL`, `JWT_SECRET`, `CLIENT_URL`, and run Prisma migrations during release. Build `/client` with `npm run build --workspace client` and serve the generated `dist` folder through your preferred static host.
-
-## Money Handling Protocol
-
-For a real production KRAVEX deployment, use this separation:
-
-- Client billing collection:
-  - `Stripe` for cards or `GoCardless` for UK bank debit mandates
-- Agency payout / owner withdrawal:
-  - your verified business bank account only
-- Accounting truth:
-  - invoices, payments, VAT, and owner withdrawals must all be stored server-side in PostgreSQL
-
-Recommended flow:
-
-1. Client signs mandate or card authorisation
-2. Monthly invoice is created automatically
-3. Provider collects payment
-4. Provider webhook marks invoice as paid
-5. VAT and operating costs are separated
-6. Only remaining owner funds become withdrawable
-7. Owner withdrawal is recorded with audit trail
-
-Do not:
-
-- store raw bank login details
-- move live client money directly from frontend code
-- rely on browser localStorage as the source of truth for payments
-- treat unpaid invoices as owner money
-
-## Backup Protocol
-
-Use at least three layers:
-
-1. Database backups
-   - daily encrypted PostgreSQL backups
-   - retain at least 30 days
-2. File and invoice backups
-   - copy generated invoices, exports, and uploads to offsite object storage
-3. App-level exports
-   - allow admin JSON/CSV export for emergency recovery
-
-Recommended recovery posture:
-
-- nightly automated PostgreSQL dump
-- weekly restore test into a staging database
-- environment variables stored in the host secret manager
-- separate backup location from app host
-- audit log for payment, deposit, billing, and account-detail changes
-
-The preview running on `5173` now includes:
-
-- local rolling snapshots
-- manual backup download
-- manual backup restore
-- payout verification flow
-
-Those preview protections are helpful for local resilience, but the real protection comes from provider-backed payments plus encrypted server-side backups on the deployed system.
+```bash
+npm run dev
+npm run db:generate
+npm run db:migrate
+npm run db:seed
+npm run build
+npm audit
+```

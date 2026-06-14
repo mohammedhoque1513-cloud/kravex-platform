@@ -1,0 +1,1 @@
+import { Card } from "@/components/shared/ui";export default function Page(){return <div><h1 className="font-heading text-5xl">Invoice</h1><Card className="mt-8">Full invoice display with Pay Now, Stripe Elements card flow and Download PDF.</Card></div>}

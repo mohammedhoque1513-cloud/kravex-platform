@@ -1,0 +1,1 @@
+import { json, prisma, requireRole } from "@/lib/api"; export async function GET(_:Request,{params}:any){const auth=await requireRole("ADMIN"); if('error'in auth) return auth.error; return json(await prisma.report.findMany({where:{clientId:params.id}}))}

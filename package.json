@@ -1,21 +1,70 @@
 {
-  "name": "kravex-platform",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Lead Generation Agency Management Platform monorepo",
-  "scripts": {
-    "dev": "concurrently \"npm run dev --workspace server\" \"npm run dev --workspace client\"",
-    "install:all": "npm install --workspaces",
-    "build": "npm run build --workspace client",
-    "start": "npm run start --workspace server",
-    "prisma:migrate": "npm run prisma:migrate --workspace server",
-    "prisma:seed": "npm run prisma:seed --workspace server"
-  },
-  "workspaces": [
-    "client",
-    "server"
-  ],
-  "devDependencies": {
-    "concurrently": "^8.2.2"
-  }
+    "name": "kravex-app",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "node --max-old-space-size=4096 ./node_modules/next/dist/bin/next dev",
+        "dev:clean": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"if (Test-Path .next) { Remove-Item .next -Recurse -Force -ErrorAction SilentlyContinue }; node --max-old-space-size=4096 ./node_modules/next/dist/bin/next dev\"",
+        "dev:kill": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"$ports = Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue; foreach ($p in $ports) { Stop-Process -Id $p.OwningProcess -Force -ErrorAction SilentlyContinue }\"",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint",
+        "db:generate": "prisma generate",
+        "db:migrate": "prisma migrate dev",
+        "db:seed": "tsx prisma/seed.ts",
+        "audit:security": "audit-ci --moderate",
+        "security:check": "audit-ci --high",
+        "test:e2e": "playwright test",
+        "test:smoke": "node scripts/smoke-routes.mjs"
+    },
+    "dependencies": {
+        "@dnd-kit/core": "^6.3.1",
+        "@dnd-kit/sortable": "^10.0.0",
+        "@dnd-kit/utilities": "^3.2.2",
+        "@hookform/resolvers": "^5.4.0",
+        "@prisma/client": "6.19.3",
+        "@stripe/react-stripe-js": "^6.5.0",
+        "@stripe/stripe-js": "^9.7.0",
+        "@types/qrcode": "^1.5.6",
+        "@vercel/blob": "^2.4.0",
+        "audit-ci": "^7.1.0",
+        "bcryptjs": "^3.0.3",
+        "bullmq": "^5.78.0",
+        "clsx": "^2.1.1",
+        "date-fns": "^4.4.0",
+        "framer-motion": "^12.40.0",
+        "ioredis": "^5.11.0",
+        "lucide-react": "^1.17.0",
+        "next": "^15.5.19",
+        "next-auth": "^4.24.14",
+        "otplib": "^13.4.1",
+        "puppeteer": "^25.1.0",
+        "qrcode": "^1.5.4",
+        "react": "^18",
+        "react-dom": "^18",
+        "react-hook-form": "^7.77.0",
+        "recharts": "^3.8.1",
+        "resend": "^6.12.4",
+        "sonner": "^2.0.7",
+        "stripe": "^22.2.0",
+        "tailwind-merge": "^3.6.0",
+        "zod": "^4.4.3"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.60.0",
+        "@types/bcryptjs": "^2.4.6",
+        "@types/node": "^20",
+        "@types/react": "^18",
+        "@types/react-dom": "^18",
+        "eslint": "^8",
+        "eslint-config-next": "^15.5.19",
+        "postcss": "^8",
+        "prisma": "6.19.3",
+        "tailwindcss": "^3.4.1",
+        "tsx": "^4.22.4",
+        "typescript": "^5"
+    },
+    "prisma": {
+        "seed": "tsx prisma/seed.ts"
+    }
 }

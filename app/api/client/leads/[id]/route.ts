@@ -1,0 +1,1 @@
+import { json, prisma, readJson, requireRole } from "@/lib/api"; export async function PUT(req:Request,{params}:any){const auth=await requireRole("CLIENT"); if('error'in auth) return auth.error; const b=await readJson(req as any); return json(await prisma.lead.update({where:{id:params.id},data:{status:b.status,clientNotes:b.clientNotes}}))}
