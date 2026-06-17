@@ -13,7 +13,11 @@ export async function POST(req: NextRequest) {
     await logSecurityEvent({ type: "RATE_LIMIT", severity: "MEDIUM", ipAddress: ip, source: "contact", description: "Contact form rate limit exceeded." });
     return json({ error: "Too many enquiries from this connection. Please try again later." }, 429);
   }
-  const body=contactSchema.parse(await readJson(req));
+  const parsed = contactSchema.safeParse(await readJson(req));
+  if (!parsed.success) {
+    return json({ error: "Invalid form data", details: parsed.error.flatten() }, 400);
+  }
+  const body = parsed.data;
   const scamReason = assessLeadSubmission(body);
   if (scamReason) {
     await logSecurityEvent({ type: scamReason.includes("business email") ? "DISPOSABLE_EMAIL" : "SCAM_PATTERN", severity: "HIGH", ipAddress: ip, email: body.email, source: "contact", description: scamReason, metadata: body });
@@ -29,7 +33,7 @@ export async function POST(req: NextRequest) {
     lead=appendLocal("leadForms", data);
     mode = "local-json";
   }
-  await sendEmail({ to: adminEmail, subject:"New Contact Submission - KRAVEX", html:`<pre>${JSON.stringify(body,null,2)}</pre>` });
-  await sendEmail({ to: body.email, subject:"We received your enquiry - KRAVEX", html:`<p>Thank you ${body.name}. We will be in touch within 24 hours.</p>` });
+  void sendEmail({ to: adminEmail, subject:"New Contact Submission - KRAVEX", html:`<pre>${JSON.stringify(body,null,2)}</pre>` }).catch((error) => console.error("Contact notification email failed:", error));
+  void sendEmail({ to: body.email, subject:"We received your enquiry - KRAVEX", html:`<p>Thank you ${body.name}. We will be in touch within 24 hours.</p>` }).catch((error) => console.error("Contact auto-reply email failed:", error));
   return json({ ok:true, mode, lead });
 }
