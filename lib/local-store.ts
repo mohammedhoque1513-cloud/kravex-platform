@@ -5,7 +5,7 @@ import { VAULT_POLICY, allocateVaultAmounts } from "@/lib/money";
 
 type LocalDb = Record<string, any[]>;
 
-const dataDir = path.join(process.cwd(), ".local");
+const dataDir = process.env.NODE_ENV === "production" ? path.join("/tmp", "kravex-local") : path.join(process.cwd(), ".local");
 const dataFile = path.join(dataDir, "kravex-data.json");
 
 const emptyDb: LocalDb = {

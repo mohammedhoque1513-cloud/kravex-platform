@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 
 export function allowLocalFallback() {
-  return process.env.NODE_ENV !== "production" && process.env.DISABLE_LOCAL_FALLBACK !== "true";
+  if (process.env.DISABLE_LOCAL_FALLBACK === "true") return false;
+  return process.env.NODE_ENV !== "production" || process.env.ENABLE_LIVE_FALLBACK === "true";
 }
 
 export function productionDbError() {

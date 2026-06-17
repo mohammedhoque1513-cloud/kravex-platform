@@ -24,6 +24,10 @@ function demoAuthorize(email: string, password: string) {
   return { id: user.id, name: user.name, email: user.email, role: user.role, clientId: user.clientId };
 }
 
+function allowDemoLogin() {
+  return process.env.NODE_ENV === "development" || process.env.ENABLE_LIVE_DEMO_LOGIN === "true";
+}
+
 async function localPortalAuthorize(email: string, password: string) {
   const users = listLocal("portalUsers");
   const user = users.find((item: any) => item.email === email && item.isActive !== false);
@@ -51,10 +55,10 @@ export const authOptions: NextAuthOptions = {
         const code = credentials?.code?.trim();
         if (!email || !password) return null;
 
-        const localDemoUser = process.env.NODE_ENV === "development" ? demoAuthorize(email, password) : null;
+        const localDemoUser = allowDemoLogin() ? demoAuthorize(email, password) : null;
         if (localDemoUser) return localDemoUser as any;
         try {
-          const localPortalUser = process.env.NODE_ENV === "development" ? await localPortalAuthorize(email, password) : null;
+          const localPortalUser = allowDemoLogin() ? await localPortalAuthorize(email, password) : null;
           if (localPortalUser) return localPortalUser as any;
         } catch (error) {
           console.error("Local portal authentication failed:", error);
