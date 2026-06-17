@@ -78,7 +78,7 @@ export function PublicFooter() {
         </div>
       </div>
       <div className="mx-auto mt-10 flex max-w-7xl flex-col gap-4 border-t border-kravex-border pt-6 text-xs leading-5 text-kravex-muted sm:flex-row sm:items-center sm:justify-between">
-        <span>© 2025 KRAVEX Ltd | Registered in England & Wales | Company No. XXXXXXXX</span>
+        <span>Copyright 2026 KRAVEX. Trading name of Emdadul Hoque. Limited company details will be published once incorporated.</span>
         <span><Link href="/privacy-policy">Privacy</Link> | <Link href="/terms">Terms</Link> | <Link href="/cookie-policy">Cookies</Link></span>
       </div>
     </footer>
