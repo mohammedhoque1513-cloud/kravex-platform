@@ -35,7 +35,7 @@ async function main() {
       { key: "growth", name: "Growth", percentage: 10, description: "Cash buffer, reinvestment and slow-month protection." },
       { key: "owner", name: "Owner Pay", percentage: 35, description: "Emdadul's available pay after reserves have been allocated.", isOwnerPay: true },
     ] });
-  });
+  }, { timeout: 30000 });
 }
 main().finally(() => prisma.$disconnect());
 
