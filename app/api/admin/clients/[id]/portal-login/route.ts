@@ -13,7 +13,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if ("error" in auth) return auth.error;
 
   const body = await readJson(req);
-  const password = body.password || temporaryPassword();
+  const password = typeof body.password === "string" && body.password.length >= 12 ? body.password : temporaryPassword();
 
   try {
     const client = await prisma.client.findUnique({ where: { id }, include: { users: true } });

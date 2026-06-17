@@ -7,6 +7,37 @@ import { listLocal } from "@/lib/local-store";
 import { logSecurityEvent } from "@/lib/security-events";
 import { decryptSecret } from "@/lib/encryption";
 
+const loginBuckets = new Map<string, { failed: number; lockedUntil: number; resetAt: number }>();
+const LOGIN_LIMIT = 5;
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+
+function loginKey(email: string) {
+  return `login:${email}`;
+}
+
+function checkLoginAllowed(email: string) {
+  const now = Date.now();
+  const bucket = loginBuckets.get(loginKey(email));
+  if (!bucket || bucket.resetAt <= now) return true;
+  return bucket.lockedUntil <= now;
+}
+
+async function recordLoginFailure(email: string, description = "Invalid login attempt.") {
+  const now = Date.now();
+  const key = loginKey(email);
+  const bucket = loginBuckets.get(key);
+  const next = !bucket || bucket.resetAt <= now
+    ? { failed: 1, lockedUntil: 0, resetAt: now + LOGIN_WINDOW_MS }
+    : { ...bucket, failed: bucket.failed + 1 };
+  if (next.failed >= LOGIN_LIMIT) next.lockedUntil = now + LOGIN_WINDOW_MS;
+  loginBuckets.set(key, next);
+  await logSecurityEvent({ type: "LOGIN_FAILURE", severity: next.lockedUntil > now ? "HIGH" : "MEDIUM", email, description });
+}
+
+function recordLoginSuccess(email: string) {
+  loginBuckets.delete(loginKey(email));
+}
+
 function demoUsers() {
   const adminPassword = process.env.DEMO_ADMIN_PASSWORD;
   const clientPassword = process.env.DEMO_CLIENT_PASSWORD;
@@ -54,12 +85,22 @@ export const authOptions: NextAuthOptions = {
         const password = credentials?.password || "";
         const code = credentials?.code?.trim();
         if (!email || !password) return null;
+        if (!checkLoginAllowed(email)) {
+          await logSecurityEvent({ type: "LOGIN_FAILURE", severity: "HIGH", email, description: "Account login temporarily locked after repeated failures." });
+          return null;
+        }
 
         const localDemoUser = allowDemoLogin() ? demoAuthorize(email, password) : null;
-        if (localDemoUser) return localDemoUser as any;
+        if (localDemoUser) {
+          recordLoginSuccess(email);
+          return localDemoUser as any;
+        }
         try {
           const localPortalUser = allowDemoLogin() ? await localPortalAuthorize(email, password) : null;
-          if (localPortalUser) return localPortalUser as any;
+          if (localPortalUser) {
+            recordLoginSuccess(email);
+            return localPortalUser as any;
+          }
         } catch (error) {
           console.error("Local portal authentication failed:", error);
         }
@@ -69,17 +110,18 @@ export const authOptions: NextAuthOptions = {
           if (user && user.isActive && !user.deletedAt) {
             const ok = await bcrypt.compare(password, user.passwordHash);
             if (!ok) {
-              await logSecurityEvent({ type: "LOGIN_FAILURE", severity: "MEDIUM", email, description: "Invalid password submitted." });
+              await recordLoginFailure(email, "Invalid password submitted.");
               return null;
             }
             if (user.twoFactorEnabled) {
               const validCode = Boolean(user.twoFactorSecret && code && verify({ token: code, secret: decryptSecret(user.twoFactorSecret) }));
               if (!validCode) {
-                await logSecurityEvent({ type: "LOGIN_FAILURE", severity: "HIGH", email, userId: user.id, description: "Valid password submitted without a valid 2FA code." });
+                await recordLoginFailure(email, "Valid password submitted without a valid 2FA code.");
                 return null;
               }
             }
             await prisma.user.update({ where: { id: user.id }, data: { lastLogin: new Date() } });
+            recordLoginSuccess(email);
             return { id: user.id, name: user.name, email: user.email, role: user.role, clientId: user.clientId } as any;
           }
         } catch (error) {
@@ -87,6 +129,7 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
+        await recordLoginFailure(email);
         return null;
       },
     }),

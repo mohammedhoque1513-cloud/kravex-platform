@@ -7,14 +7,16 @@ export async function PUT(req: NextRequest) {
   const auth = await requireRole("CLIENT");
   if ("error" in auth) return auth.error;
   const body = await readJson(req);
-  if (body.newPassword !== body.confirmPassword) return json({ error: "Passwords do not match." }, 400);
-  const parsed = passwordSchema.safeParse(body.newPassword);
+  const newPassword = typeof body.newPassword === "string" ? body.newPassword : "";
+  const confirmPassword = typeof body.confirmPassword === "string" ? body.confirmPassword : "";
+  if (newPassword !== confirmPassword) return json({ error: "Passwords do not match." }, 400);
+  const parsed = passwordSchema.safeParse(newPassword);
   if (!parsed.success) return json({ error: "Password must be at least 8 characters and include a capital letter and a number." }, 400);
 
   try {
     await prisma.user.update({
       where: { id: (auth.user as any).id },
-      data: { passwordHash: await bcrypt.hash(body.newPassword, 12) },
+      data: { passwordHash: await bcrypt.hash(newPassword, 12) },
     });
     return json({ ok: true, mode: "postgres" });
   } catch {

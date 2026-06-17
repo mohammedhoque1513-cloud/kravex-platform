@@ -50,27 +50,28 @@ export async function PUT(req: NextRequest) {
   if ("error" in auth) return auth.error;
   const user = auth.user as any;
   const body = await readJson(req);
+  const data = {
+    name: typeof body.name === "string" ? body.name : "",
+    email: typeof body.email === "string" ? body.email.toLowerCase() : "",
+    phone: typeof body.phone === "string" ? body.phone : "",
+    businessName: typeof body.businessName === "string" ? body.businessName : "Patel Dental",
+  };
+  if (!data.name || !data.email) return json({ error: "Name and email are required." }, 400);
 
   try {
     const updated = await prisma.user.update({
       where: { id: user.id },
-      data: { name: body.name, email: body.email },
+      data: { name: data.name, email: data.email },
     });
-    if (user.clientId && body.phone) {
-      await prisma.client.update({ where: { id: user.clientId }, data: { phone: body.phone } });
+    if (user.clientId && data.phone) {
+      await prisma.client.update({ where: { id: user.clientId }, data: { phone: data.phone } });
     }
     return json({ ok: true, mode: "postgres", profile: updated });
   } catch {
     const rows = listLocal("accountProfiles");
     const existing = rows.find((row: any) => row.userId === user.id);
-    const data = {
-      userId: user.id,
-      name: body.name,
-      email: body.email,
-      phone: body.phone,
-      businessName: body.businessName || "Patel Dental",
-    };
-    const profile = existing ? updateLocal("accountProfiles", existing.id, data) : appendLocal("accountProfiles", data);
+    const profileData = { userId: user.id, ...data };
+    const profile = existing ? updateLocal("accountProfiles", existing.id, profileData) : appendLocal("accountProfiles", profileData);
     return json({ ok: true, mode: "local-json", profile });
   }
 }
