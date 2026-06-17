@@ -1,33 +1,24 @@
 import {
   BarChart3,
   Bell,
-  Building2,
-  CreditCard,
-  FileBarChart,
-  FileText,
-  LayoutDashboard,
-  Megaphone,
   Search,
-  Settings,
-  ShieldCheck,
-  Target,
-  Users,
 } from "lucide-react";
 import { BrandLogo } from "@/components/shared/ui";
 import { LogoutButton } from "@/components/shared/logout-button";
+import { PortalNavLink } from "@/components/shared/portal-nav-link";
 
 const links = [
-  { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-  { label: "Prospects", href: "/admin/prospects", icon: Target },
-  { label: "Clients", href: "/admin/clients", icon: Building2 },
-  { label: "Leads", href: "/admin/leads", icon: Users },
-  { label: "Campaigns", href: "/admin/campaigns", icon: Megaphone },
-  { label: "Invoices", href: "/admin/invoices", icon: FileText },
-  { label: "Payments", href: "/admin/payments", icon: CreditCard },
-  { label: "Reports", href: "/admin/reports", icon: FileBarChart },
-  { label: "Security", href: "/admin/security", icon: ShieldCheck },
-  { label: "Settings", href: "/admin/settings", icon: Settings },
-];
+  { label: "Dashboard", href: "/admin/dashboard", icon: "LayoutDashboard" },
+  { label: "Prospects", href: "/admin/prospects", icon: "Target" },
+  { label: "Clients", href: "/admin/clients", icon: "Building2" },
+  { label: "Leads", href: "/admin/leads", icon: "Users" },
+  { label: "Campaigns", href: "/admin/campaigns", icon: "Megaphone" },
+  { label: "Invoices", href: "/admin/invoices", icon: "FileText" },
+  { label: "Payments", href: "/admin/payments", icon: "CreditCard" },
+  { label: "Reports", href: "/admin/reports", icon: "FileBarChart" },
+  { label: "Security", href: "/admin/security", icon: "ShieldCheck" },
+  { label: "Settings", href: "/admin/settings", icon: "Settings" },
+] as const;
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -45,11 +36,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="mt-4 h-2 rounded bg-black"><div className="h-2 w-0 rounded bg-kravex-gold" /></div>
           </div>
           <nav className="mt-8 grid gap-1">
-            {links.map(({ label, href, icon: Icon }) => (
-              <a key={href} href={href} className="group flex items-center gap-3 rounded border-l-2 border-transparent px-4 py-3 text-sm font-semibold text-kravex-secondary transition hover:border-kravex-gold hover:bg-kravex-card hover:text-kravex-gold">
-                <Icon size={18} className="text-kravex-muted group-hover:text-kravex-gold" />
-                {label}
-              </a>
+            {links.map(({ label, href, icon }) => (
+              <PortalNavLink key={href} href={href} label={label} icon={icon} variant="admin-desktop" />
             ))}
           </nav>
           <div className="mt-auto rounded border border-kravex-border bg-kravex-card p-4">
@@ -87,11 +75,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-kravex-border bg-black/95 px-2 py-2 backdrop-blur lg:hidden" aria-label="Admin mobile navigation">
         <div className="flex gap-2 overflow-x-auto pb-1">
-          {links.map(({ label, href, icon: Icon }) => (
-            <a key={href} href={href} className="flex min-w-[76px] flex-col items-center gap-1 rounded border border-transparent px-2 py-2 text-[11px] font-semibold text-kravex-secondary hover:border-kravex-gold/40 hover:text-kravex-gold">
-              <Icon size={18} />
-              <span>{label}</span>
-            </a>
+          {links.map(({ label, href, icon }) => (
+            <PortalNavLink key={href} href={href} label={label} icon={icon} variant="admin-mobile" />
           ))}
           <div className="flex min-w-[76px] items-center justify-center px-2"><LogoutButton compact /></div>
         </div>

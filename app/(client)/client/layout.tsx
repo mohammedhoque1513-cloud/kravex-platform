@@ -1,14 +1,14 @@
-import { Home, Mail, ReceiptText, Target, UserRound } from "lucide-react";
 import { BrandLogo } from "@/components/shared/ui";
 import { LogoutButton } from "@/components/shared/logout-button";
+import { PortalNavLink } from "@/components/shared/portal-nav-link";
 
 const links = [
-  { label: "Dashboard", href: "/client/dashboard", icon: Home },
-  { label: "Leads", href: "/client/leads", icon: Target },
-  { label: "Invoices", href: "/client/invoices", icon: ReceiptText },
-  { label: "Messages", href: "/client/messages", icon: Mail },
-  { label: "Account", href: "/client/account", icon: UserRound },
-];
+  { label: "Dashboard", href: "/client/dashboard", icon: "Home" },
+  { label: "Leads", href: "/client/leads", icon: "Target" },
+  { label: "Invoices", href: "/client/invoices", icon: "ReceiptText" },
+  { label: "Messages", href: "/client/messages", icon: "Mail" },
+  { label: "Account", href: "/client/account", icon: "UserRound" },
+] as const;
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -19,11 +19,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             <BrandLogo />
             <p className="mt-3 text-sm text-kravex-secondary">Client Portal</p>
             <nav className="mt-10 grid gap-2">
-              {links.map(({ label, href, icon: Icon }) => (
-                <a key={href} href={href} className="flex items-center gap-3 rounded px-4 py-3 text-kravex-secondary hover:bg-kravex-card hover:text-kravex-gold">
-                  <Icon size={18} />
-                  {label}
-                </a>
+              {links.map(({ label, href, icon }) => (
+                <PortalNavLink key={href} href={href} label={label} icon={icon} variant="client-desktop" />
               ))}
             </nav>
           </div>
@@ -42,11 +39,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-kravex-border bg-black/95 px-2 py-2 backdrop-blur lg:hidden" aria-label="Client mobile navigation">
         <div className="grid grid-cols-6 gap-1">
-          {links.map(({ label, href, icon: Icon }) => (
-            <a key={href} href={href} className="flex min-w-0 flex-col items-center gap-1 rounded px-1 py-2 text-[10px] font-semibold text-kravex-secondary hover:text-kravex-gold">
-              <Icon size={18} />
-              <span className="truncate">{label}</span>
-            </a>
+          {links.map(({ label, href, icon }) => (
+            <PortalNavLink key={href} href={href} label={label} icon={icon} variant="client-mobile" />
           ))}
           <div className="flex items-center justify-center"><LogoutButton compact /></div>
         </div>
