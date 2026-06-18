@@ -8,17 +8,11 @@ import {
   Check,
   ClipboardCheck,
   CreditCard,
-  FileBarChart,
   Headphones,
   Landmark,
   LockKeyhole,
-  MailCheck,
-  MessageSquare,
-  PhoneCall,
-  Search,
   ShieldCheck,
   Sparkles,
-  Target,
   TrendingUp,
   Users,
 } from "lucide-react";
@@ -30,59 +24,50 @@ const industries = [
   {
     icon: Sparkles,
     title: "Cosmetic Dentistry",
-    copy: "Implants, veneers, Invisalign and high-value treatment enquiries from people actively looking for clinics.",
+    copy: "You get treatment enquiries from people already looking for help.",
     leadTypes: "Treatment enquiry, consultation request, finance-ready patient",
   },
   {
     icon: BadgeCheck,
     title: "Aesthetic Clinics",
-    copy: "Botox, fillers, skin treatments, laser and consultation leads for clinics that need a steady appointment flow.",
+    copy: "You get consultation requests from people ready to book.",
     leadTypes: "Consultation request, treatment interest, repeat-care opportunity",
   },
   {
     icon: BriefcaseBusiness,
     title: "Roofing & Trades",
-    copy: "Homeowner and commercial enquiries for repairs, replacements, inspections and quote requests.",
+    copy: "You get quote requests for repairs, replacements and urgent jobs.",
     leadTypes: "Quote request, emergency repair, planned project",
   },
   {
     icon: Landmark,
     title: "Legal & Solicitors",
-    copy: "Structured enquiry capture for practice areas where clarity, compliance and fast response matter.",
+    copy: "You get clear case enquiries you can respond to quickly.",
     leadTypes: "Case enquiry, call request, document-ready prospect",
   },
 ];
 
 const deliverySteps = [
-  ["01", "Discovery", "We map your offer, service area, target customer, pricing reality and what counts as a qualified lead."],
-  ["02", "Campaign build", "KRAVEX builds the lead capture route, tracking, outreach/ad plan and qualification workflow."],
-  ["03", "Launch", "Campaigns go live, forms and phone intake are monitored, and leads start entering the pipeline."],
-  ["04", "Delivery", "Qualified leads are delivered into your portal with contact details, notes, source and quality level."],
-  ["05", "Review", "You see what arrived, what converted, what needs improving and what the next month should focus on."],
+  ["01", "Discovery", "You show KRAVEX your offer, area and ideal customer."],
+  ["02", "Build", "Your campaign, forms and tracking are set up around that customer."],
+  ["03", "Launch", "Your campaign goes live and enquiries start coming in."],
+  ["04", "Delivery", "You receive each qualified lead with the details you need to call."],
+  ["05", "Review", "You see what worked and what needs improving next month."],
 ];
 
 const leadDefinition = [
-  "A real person or business with contact details",
-  "A service need that matches your agreed niche",
-  "Located inside your target UK area",
-  "Captured through a tracked KRAVEX campaign or intake form",
-  "Delivered with source, notes and quality status",
-];
-
-const included = [
-  [Search, "Market and niche research", "We identify the people most likely to enquire, not just broad audiences."],
-  [Target, "Campaign setup", "Landing flow, forms, tracking, targeting and lead qualification rules."],
-  [PhoneCall, "Lead intake", "Public form submissions and phone-call leads both feed the same pipeline."],
-  [MailCheck, "Lead delivery", "New leads are organised by quality, source, status and date delivered."],
-  [FileBarChart, "Monthly reporting", "You see lead volume, target progress, quality split and invoice/payment status."],
-  [MessageSquare, "Client communication", "Updates, notes and lead questions stay inside the client portal."],
+  "You can contact the person",
+  "You offer the service requested",
+  "You cover the requested area",
+  "You know where the enquiry came from",
+  "You get notes before you call",
 ];
 
 const notIncluded = [
-  "We do not promise fake guaranteed revenue numbers.",
-  "We do not count spam, wrong-area enquiries or irrelevant contacts as qualified leads.",
-  "We do not take card details over public forms.",
-  "We do not hide performance behind vague marketing reports.",
+  "You will not be promised fake revenue numbers.",
+  "You will not be charged for spam or wrong-area enquiries.",
+  "You will not be asked for card details on public forms.",
+  "You will not be left guessing what arrived.",
 ];
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
@@ -95,8 +80,8 @@ function PortalPreview() {
       <div className="absolute right-0 top-0 h-40 w-40 rounded-bl-full bg-kravex-gold/10" />
       <div className="relative flex items-center justify-between border-b border-kravex-border pb-4">
         <div>
-          <p className="font-heading text-2xl">Client portal</p>
-          <p className="text-sm text-kravex-secondary">Live lead delivery view</p>
+          <p className="font-heading text-2xl">Lead dashboard</p>
+          <p className="text-sm text-kravex-secondary">Your live lead view</p>
         </div>
         <span className="rounded border border-kravex-gold/40 px-3 py-1 text-xs font-bold uppercase text-kravex-gold">Secure</span>
       </div>
@@ -136,13 +121,13 @@ export default function Home() {
           <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
             <Eyebrow>UK Lead Generation Agency</Eyebrow>
             <h1 className="mt-5 max-w-4xl font-heading text-4xl leading-[.98] text-white sm:text-6xl lg:text-7xl">
-              Qualified leads for UK businesses that need a fuller pipeline.
+              Qualified roofing leads for your next booked job.
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-kravex-secondary">
-              KRAVEX builds and manages monthly lead generation campaigns for dentists, aesthetic clinics, roofers, trades, solicitors and other UK service businesses. You get qualified enquiries delivered into a client portal, with clear notes, lead quality and reporting.
+              You get roofing enquiries from people ready to book your work.
             </p>
             <div className="mt-8 grid gap-3 text-sm text-white sm:grid-cols-2">
-              {["Fixed monthly retainer", "Qualified lead delivery", "Client portal included", "UK-only service areas"].map((item) => (
+              {["Fixed monthly retainer", "Qualified enquiries", "Your live lead dashboard", "UK-only service areas"].map((item) => (
                 <p key={item} className="flex items-center gap-3 rounded border border-kravex-border bg-kravex-card px-4 py-3">
                   <Check size={17} className="text-kravex-gold" />
                   {item}
@@ -165,10 +150,10 @@ export default function Home() {
       <section className="border-y border-kravex-gold/70 bg-kravex-dark px-5 py-8">
         <div className="mx-auto grid max-w-7xl gap-5 text-sm md:grid-cols-4">
           {[
-            ["Who", "UK service businesses with high-value enquiries"],
-            ["What", "Monthly lead generation and qualification"],
-            ["How", "Campaigns, forms, phone intake and client portal"],
-            ["Outcome", "A clearer pipeline and faster follow-up"],
+            ["Who", "You rely on word of mouth and need steadier roofing work"],
+            ["What", "You get qualified enquiries every month"],
+            ["How", "Your campaign finds people who need your service"],
+            ["Outcome", "More booked jobs. Less time chasing."],
           ].map(([label, value]) => (
             <div key={label} className="border-l border-kravex-gold/50 pl-4">
               <p className="font-mono text-xs uppercase tracking-[.25em] text-kravex-gold">{label}</p>
@@ -179,26 +164,12 @@ export default function Home() {
       </section>
 
       <Section id="what-we-do" className="bg-white text-black">
-        <div className="grid gap-12 lg:grid-cols-[.86fr_1.14fr]">
-          <div>
+        <div className="max-w-3xl">
             <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-mutedGold">The service</p>
             <h2 className="mt-4 font-heading text-4xl sm:text-5xl">KRAVEX runs your lead pipeline, not just your adverts.</h2>
             <p className="mt-6 leading-8 text-gray-600">
-              Most businesses do not need more dashboards, random ads or vague marketing activity. They need a repeatable way to attract the right enquiries, capture them cleanly, qualify them quickly and follow them up before they go cold.
+              You need the right enquiries coming in each month. KRAVEX finds them, checks the fit, and gives you the details to call before the lead goes cold.
             </p>
-            <p className="mt-5 leading-8 text-gray-600">
-              That is the KRAVEX job: build the campaign, handle the intake path, organise the lead data, and give you a clear monthly view of what has actually arrived.
-            </p>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            {included.map(([Icon, title, copy]: any) => (
-              <div key={title} className="rounded-lg border border-black/15 bg-white p-5 shadow-sm transition hover:border-kravex-gold">
-                <Icon className="text-kravex-gold" size={22} />
-                <h3 className="mt-4 font-bold">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-gray-600">{copy}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </Section>
 
@@ -206,20 +177,20 @@ export default function Home() {
         <div className="grid gap-12 lg:grid-cols-[1fr_.9fr]">
           <div>
             <Eyebrow>Who It Is For</Eyebrow>
-            <h2 className="mt-4 font-heading text-4xl sm:text-5xl">Built for businesses where one good enquiry matters.</h2>
+            <h2 className="mt-4 font-heading text-4xl sm:text-5xl">Built for you when one good enquiry matters.</h2>
             <p className="mt-6 max-w-2xl leading-8 text-kravex-secondary">
-              KRAVEX is best suited to service businesses where enquiries have meaningful value, fast response matters, and the owner needs a predictable pipeline instead of waiting for referrals.
+              You get the most from KRAVEX when one good job is worth chasing properly.
             </p>
           </div>
           <div className="rounded-lg border border-kravex-border bg-kravex-card p-6">
-            <p className="font-bold text-white">A KRAVEX client usually has:</p>
+            <p className="font-bold text-white">You are a good fit when you have:</p>
             <div className="mt-5 grid gap-3 text-sm text-kravex-secondary">
               {[
                 "A defined service area in the UK",
                 "A service worth following up properly",
                 "Capacity to respond to new enquiries",
-                "A monthly budget for consistent acquisition",
-                "A need for clear reporting and accountability",
+                "A monthly budget for steady leads",
+                "A need to see exactly what arrived",
               ].map((item) => (
                 <p key={item} className="flex gap-3"><Check className="shrink-0 text-kravex-gold" size={18} />{item}</p>
               ))}
@@ -244,7 +215,7 @@ export default function Home() {
           <Eyebrow>Lead Quality</Eyebrow>
           <h2 className="mt-4 font-heading text-4xl sm:text-5xl">What counts as a lead?</h2>
           <p className="mx-auto mt-5 max-w-2xl leading-8 text-kravex-secondary">
-            A lead is not a random form fill. It has to match the agreed rules for your campaign, your service area and your business.
+            You should only spend time on enquiries that match your area and your service.
           </p>
         </div>
         <div className="mt-10 grid gap-5 md:grid-cols-5">
@@ -263,7 +234,7 @@ export default function Home() {
             <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-mutedGold">The Process</p>
             <h2 className="mt-4 font-heading text-4xl sm:text-5xl">From strategy call to monthly delivery.</h2>
             <p className="mt-6 leading-8 text-gray-600">
-              The first call is not a sales script. It is where KRAVEX checks whether your industry, area, budget and offer are strong enough for a sensible monthly campaign.
+              Your first call checks your area, budget and offer before anything is sold.
             </p>
             <div className="mt-8"><GoldButton href="#lead-form">Book the Strategy Call</GoldButton></div>
           </div>
@@ -284,15 +255,15 @@ export default function Home() {
       <Section className="bg-kravex-black">
         <div className="grid gap-10 lg:grid-cols-2">
           <div>
-            <Eyebrow>Client Portal</Eyebrow>
-            <h2 className="mt-4 font-heading text-4xl sm:text-5xl">Every client gets visibility.</h2>
+            <Eyebrow>Lead Dashboard</Eyebrow>
+            <h2 className="mt-4 font-heading text-4xl sm:text-5xl">You see every lead in one place.</h2>
             <p className="mt-6 leading-8 text-kravex-secondary">
-              Paying clients do not have to guess what KRAVEX is doing. They can see their leads, status updates, invoices, messages and account details in one secure portal.
+              You can see your leads, invoices, messages and account details in one secure place.
             </p>
             <div className="mt-7 grid gap-3">
               {[
                 [Users, "Lead list with quality and source"],
-                [ClipboardCheck, "Status updates and client notes"],
+                [ClipboardCheck, "Status updates and your notes"],
                 [CreditCard, "Invoices and card payment flow"],
                 [Headphones, "Messages and campaign updates"],
               ].map(([Icon, text]: any) => (
@@ -307,9 +278,9 @@ export default function Home() {
       <Section className="bg-kravex-dark">
         <div className="grid gap-6 lg:grid-cols-3">
           {[
-            [ShieldCheck, "Clean acquisition", "Lead forms block repeated submissions, disposable emails, suspicious links and scam phrases before storage."],
-            [LockKeyhole, "Secure portal", "Admin and client areas are role-protected, with 2FA support for real accounts."],
-            [TrendingUp, "Fair delivery", "Queues, caching and indexed database design support consistent service as the client base grows."],
+            [ShieldCheck, "Cleaner enquiries", "Your forms block repeat submissions, throwaway emails, suspicious links and scam phrases."],
+            [LockKeyhole, "Secure account", "Your account is role-protected, with 2FA support when you enable it."],
+            [TrendingUp, "Steady service", "Your service stays fast as KRAVEX grows."],
           ].map(([Icon, title, copy]: any) => (
             <Card key={title}>
               <Icon className="text-kravex-gold" />
@@ -326,7 +297,7 @@ export default function Home() {
             <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-mutedGold">Honest Boundaries</p>
             <h2 className="mt-4 font-heading text-4xl sm:text-5xl">Serious results require serious rules.</h2>
             <p className="mt-6 leading-8 text-gray-600">
-              KRAVEX is built to be accountable, but no responsible lead generation agency should pretend every enquiry becomes revenue. The job is to create a stronger pipeline, make lead flow visible, and improve the monthly acquisition system.
+              You should expect honest lead generation. You should not expect every enquiry to become paid work.
             </p>
           </div>
           <div className="grid gap-4">
@@ -345,13 +316,13 @@ export default function Home() {
             <Eyebrow>Start Here</Eyebrow>
             <h2 className="mt-4 font-heading text-4xl sm:text-5xl">Get your free strategy call.</h2>
             <p className="mt-6 leading-8 text-kravex-secondary">
-              Tell KRAVEX what you do, where you operate and what type of leads you want. No account is needed. If you prefer to call, Emdadul can enter the same details from the admin dashboard.
+              Tell KRAVEX what you do, where you work and what enquiries you want. You do not need an account.
             </p>
             <div className="mt-7 grid gap-3 text-sm text-kravex-secondary">
               {[
                 "No commitment",
                 "30 minute review",
-                "UK businesses only",
+                "UK service areas only",
                 "Clear next step after the call",
               ].map((item) => (
                 <p key={item} className="flex gap-3"><Check className="text-kravex-gold" size={18} />{item}</p>
@@ -368,7 +339,7 @@ export default function Home() {
         <div className="mx-auto flex max-w-7xl flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h2 className="font-heading text-4xl sm:text-5xl">Ready to make the pipeline visible?</h2>
-            <p className="mt-4 max-w-2xl leading-7">Book the strategy call and find out whether KRAVEX is the right lead generation partner for your business.</p>
+            <p className="mt-4 max-w-2xl leading-7">Book the strategy call and see whether KRAVEX can bring you better enquiries.</p>
           </div>
           <a href="#lead-form" className="inline-flex items-center justify-center gap-2 rounded bg-black px-6 py-4 font-bold text-white">
             Request a Free Strategy Call
