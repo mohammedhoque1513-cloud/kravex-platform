@@ -65,10 +65,10 @@ export function PublicFooter() {
         <div>
           <h3 className="font-bold">Industries</h3>
           <div className="mt-4 grid gap-2 text-sm text-kravex-secondary">
-            <span>Cosmetic Dentistry</span>
-            <span>Aesthetic Clinics</span>
-            <span>Roofing & Trades</span>
-            <span>Legal & Solicitors</span>
+            <span>Roof Repairs</span>
+            <span>Roof Replacements</span>
+            <span>Guttering & Fascias</span>
+            <span>Flat Roofing</span>
           </div>
         </div>
         <div>

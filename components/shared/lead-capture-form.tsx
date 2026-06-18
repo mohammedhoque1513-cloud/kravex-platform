@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Script from "next/script";
 
-const industries = ["Cosmetic Dentistry", "Aesthetic Clinic", "Roofing & Trades", "Legal & Solicitors", "Mortgage Brokers", "Other"];
+const industries = ["Roof Repairs", "Roof Replacements", "Guttering & Fascias", "Flat Roofing", "Chimneys & Leadwork", "Other Roofing Work"];
 const budgets = ["Under £500", "£500 - £1,000", "£1,000 - £2,000", "£2,000+", "Not sure yet"];
 const sources = ["Google", "LinkedIn", "Referral", "Cold Email", "Other"];
 const temperatures = ["HOT", "WARM", "COLD"];

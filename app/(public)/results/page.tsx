@@ -12,25 +12,25 @@ const metrics = [
 
 const examples = [
   {
-    title: "Dental clinic campaign",
-    industry: "Cosmetic Dentistry",
+    title: "Roof repair campaign",
+    industry: "Roof Repairs",
     location: "Birmingham",
-    outcome: "Treatment enquiries organised by lead quality and consultation intent.",
-    metrics: ["Implant interest", "Consultation request", "Finance conversation"],
+    outcome: "Urgent repair enquiries organised by job type and call priority.",
+    metrics: ["Leak repair", "Storm damage", "Same-week callout"],
   },
   {
-    title: "Roofing lead campaign",
-    industry: "Roofing & Trades",
+    title: "Reroof quote campaign",
+    industry: "Roof Replacements",
     location: "Manchester",
-    outcome: "Quote requests captured with job type, urgency and contact details.",
-    metrics: ["Repair enquiry", "Replacement quote", "Inspection request"],
+    outcome: "Larger quote requests captured with location, job detail and contact details.",
+    metrics: ["Replacement quote", "Inspection request", "Planned project"],
   },
   {
-    title: "Aesthetic clinic campaign",
-    industry: "Aesthetic Clinics",
-    location: "UK local area",
-    outcome: "Consultation enquiries segmented by treatment interest and readiness.",
-    metrics: ["Injectables", "Skin treatment", "Laser enquiry"],
+    title: "Guttering campaign",
+    industry: "Guttering & Fascias",
+    location: "Cardiff",
+    outcome: "Smaller exterior enquiries kept clear enough for fast follow-up.",
+    metrics: ["Gutter repair", "Fascia quote", "Roofline work"],
   },
 ];
 
@@ -42,7 +42,7 @@ export default function Page() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">Results</p>
             <h1 className="mt-5 max-w-4xl font-heading text-4xl sm:text-5xl lg:text-6xl">Measured pipeline, not vague marketing noise.</h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-kravex-secondary">KRAVEX results are judged by what matters to a service business: qualified enquiries, clear source data, fast follow-up visibility and monthly progress against lead targets.</p>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-kravex-secondary">KRAVEX results are judged by what matters to you: qualified enquiries, clear job details, fast follow-up and monthly progress against your lead target.</p>
             <div className="mt-8 flex flex-wrap gap-4">
               <GoldButton href="/contact">Book a Strategy Call</GoldButton>
               <OutlineButton href="/how-it-works">See How Delivery Works</OutlineButton>
@@ -92,7 +92,7 @@ export default function Page() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-mutedGold">Proof Standards</p>
             <h2 className="mt-4 font-heading text-4xl sm:text-5xl">What counts as proof?</h2>
-            <p className="mt-6 leading-8 text-gray-600">KRAVEX should only call something a result when it can be tied back to the campaign, the lead record, the client portal, or the client’s own conversion feedback.</p>
+            <p className="mt-6 leading-8 text-gray-600">KRAVEX should only call something a result when it can be tied back to the campaign, the lead record, your dashboard, or your own conversion feedback.</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             {[
@@ -116,7 +116,7 @@ export default function Page() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">Important</p>
             <h2 className="mt-4 font-heading text-4xl sm:text-5xl">Lead generation is not the same as sales closing.</h2>
-            <p className="mt-6 leading-8 text-kravex-secondary">KRAVEX can build and manage the pipeline. Your business still needs to answer quickly, follow up properly, quote clearly and close professionally.</p>
+            <p className="mt-6 leading-8 text-kravex-secondary">KRAVEX can build and manage the lead flow. You still need to answer quickly, follow up properly, quote clearly and close professionally.</p>
           </div>
           <Card>
             <TrendingUp className="text-kravex-gold" />
