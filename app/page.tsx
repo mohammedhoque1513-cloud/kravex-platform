@@ -9,7 +9,6 @@ import {
   ClipboardCheck,
   CreditCard,
   Headphones,
-  Landmark,
   LockKeyhole,
   ShieldCheck,
   Sparkles,
@@ -23,27 +22,27 @@ import { LeadCaptureForm } from "@/components/shared/lead-capture-form";
 const industries = [
   {
     icon: Sparkles,
-    title: "Cosmetic Dentistry",
-    copy: "You get treatment enquiries from people already looking for help.",
-    leadTypes: "Treatment enquiry, consultation request, finance-ready patient",
+    title: "Roof Repairs",
+    copy: "You get urgent repair enquiries from homeowners who need help fast.",
+    leadTypes: "Leak repair, storm damage, emergency callout",
   },
   {
     icon: BadgeCheck,
-    title: "Aesthetic Clinics",
-    copy: "You get consultation requests from people ready to book.",
-    leadTypes: "Consultation request, treatment interest, repeat-care opportunity",
+    title: "Roof Replacements",
+    copy: "You get quote requests for bigger jobs worth proper follow-up.",
+    leadTypes: "Full replacement, reroof quote, inspection request",
   },
   {
     icon: BriefcaseBusiness,
-    title: "Roofing & Trades",
-    copy: "You get quote requests for repairs, replacements and urgent jobs.",
-    leadTypes: "Quote request, emergency repair, planned project",
+    title: "Guttering & Fascias",
+    copy: "You get smaller job enquiries that can keep your diary moving.",
+    leadTypes: "Gutter repair, fascia quote, roofline work",
   },
   {
-    icon: Landmark,
-    title: "Legal & Solicitors",
-    copy: "You get clear case enquiries you can respond to quickly.",
-    leadTypes: "Case enquiry, call request, document-ready prospect",
+    icon: ShieldCheck,
+    title: "Flat Roofing",
+    copy: "You get enquiries for felt, GRP and commercial roof work.",
+    leadTypes: "Flat roof quote, repair request, commercial lead",
   },
 ];
 
@@ -96,9 +95,9 @@ function PortalPreview() {
           </div>
         </div>
         {[
-          ["New enquiry", "Cosmetic Dentistry", "HOT", "Consultation requested"],
-          ["Quote request", "Roofing & Trades", "WARM", "Needs call back"],
-          ["Case enquiry", "Legal", "WARM", "Details captured"],
+          ["Leak repair", "Roof Repairs", "HOT", "Needs call today"],
+          ["Quote request", "Roof Replacements", "WARM", "Inspection needed"],
+          ["Gutter repair", "Guttering & Fascias", "WARM", "Details captured"],
         ].map((lead) => (
           <div key={lead[0]} className="grid gap-3 rounded border border-kravex-border bg-black p-4 sm:grid-cols-[1fr_auto]">
             <div>
