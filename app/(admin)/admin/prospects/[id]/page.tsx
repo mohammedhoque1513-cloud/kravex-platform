@@ -10,8 +10,8 @@ export default function Page() {
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">Prospect profile</p>
-          <h1 className="mt-3 font-heading text-5xl">Harborne Aesthetics</h1>
-          <p className="mt-3 text-kravex-secondary">Aesthetic clinic Â· Birmingham Â· Proposal value {formatMoney(180000)}</p>
+          <h1 className="mt-3 font-heading text-5xl">Harborne Electrical</h1>
+          <p className="mt-3 text-kravex-secondary">Electrical contractor Â· Birmingham Â· Proposal value {formatMoney(180000)}</p>
         </div>
         <div className="flex flex-wrap gap-3">
           <button className="rounded bg-kravex-success px-5 py-3 font-bold text-black">Convert to Client</button>
@@ -22,7 +22,7 @@ export default function Page() {
         <Card>
           <h2 className="font-heading text-2xl">Profile</h2>
           <div className="mt-6 grid gap-4 text-sm">
-            <p className="flex items-center gap-3"><Mail className="text-kravex-gold" size={18} /> hello@harborneaesthetics.co.uk</p>
+            <p className="flex items-center gap-3"><Mail className="text-kravex-gold" size={18} /> hello@harborneelectrical.co.uk</p>
             <p className="flex items-center gap-3"><Phone className="text-kravex-gold" size={18} /> 0121 555 0100</p>
             <p className="flex items-center gap-3"><CalendarClock className="text-kravex-gold" size={18} /> Follow up tomorrow</p>
           </div>

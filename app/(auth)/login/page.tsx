@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { FormEvent, useEffect, useState } from "react";
 import { getSession, signIn } from "next-auth/react";
@@ -53,7 +53,7 @@ export default function Login() {
       <form method="post" action="/api/auth/noop" onSubmit={handleSubmit} className="w-full max-w-md rounded-lg border border-kravex-gold/60 bg-kravex-card p-8 shadow-gold">
         <BrandLogo />
         <h1 className="mt-8 font-heading text-4xl">Sign in</h1>
-        <p className="mt-2 text-sm text-kravex-secondary">Access the KRAVEX admin or client portal.</p>
+        <p className="mt-2 text-sm text-kravex-secondary">Access the KRAVEX admin or client dashboard.</p>
         <input name="email" type="email" autoComplete="email" placeholder="Email" required className="mt-6 w-full rounded border border-kravex-border bg-black px-4 py-3 text-white gold-focus" />
         <input name="password" type="password" autoComplete="current-password" placeholder="Password" required className="mt-4 w-full rounded border border-kravex-border bg-black px-4 py-3 text-white gold-focus" />
         <input name="code" inputMode="numeric" autoComplete="one-time-code" placeholder="2FA code if enabled" className="mt-4 w-full rounded border border-kravex-border bg-black px-4 py-3 text-white gold-focus" />

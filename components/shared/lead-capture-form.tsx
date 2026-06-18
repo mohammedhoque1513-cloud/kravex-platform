@@ -2,8 +2,8 @@
 
 import { useState, type FormEvent } from "react";
 import Script from "next/script";
+import { constructionNiches, subNichesByTrade } from "@/lib/construction-niches";
 
-const industries = ["Roof Repairs", "Roof Replacements", "Guttering & Fascias", "Flat Roofing", "Chimneys & Leadwork", "Other Roofing Work"];
 const budgets = ["Under £500", "£500 - £1,000", "£1,000 - £2,000", "£2,000+", "Not sure yet"];
 const sources = ["Google", "LinkedIn", "Referral", "Cold Email", "Other"];
 const temperatures = ["HOT", "WARM", "COLD"];
@@ -25,6 +25,7 @@ function fieldClass(className = "") {
 export function LeadCaptureForm({ mode = "public" }: { mode?: "public" | "admin" }) {
   const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [trade, setTrade] = useState<(typeof constructionNiches)[number]>("Roofing");
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -74,15 +75,20 @@ export function LeadCaptureForm({ mode = "public" }: { mode?: "public" | "admin"
       </div>
       <input name="phone" required placeholder="UK phone number" className={fieldClass()} />
       <div className="grid gap-4 md:grid-cols-2">
-        <select name="service" required className={fieldClass()}>
-          {industries.map((item) => <option key={item}>{item}</option>)}
+        <select name="service" required value={trade} onChange={(event) => setTrade(event.target.value as typeof trade)} className={fieldClass()}>
+          {constructionNiches.map((item) => <option key={item}>{item}</option>)}
         </select>
-        <input name="city" required placeholder="City" className={fieldClass()} />
+        <select name="subService" required className={fieldClass()}>
+          {subNichesByTrade[trade].map((item) => <option key={item}>{item}</option>)}
+        </select>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
+        <input name="city" required placeholder="City" className={fieldClass()} />
         <select name="budget" className={fieldClass()}>
           {budgets.map((item) => <option key={item}>{item}</option>)}
         </select>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
         <select name="referralSource" className={fieldClass()}>
           {sources.map((item) => <option key={item}>{item}</option>)}
         </select>

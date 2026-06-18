@@ -6,28 +6,28 @@ const packages = [
   {
     name: "Starter",
     price: "£750/month",
-    bestFor: "Focused local businesses testing one clear lead channel.",
-    includes: ["Strategy call and campaign map", "One main niche or service", "Lead capture form and qualification rules", "Client portal access", "Monthly summary report"],
+    bestFor: "Ideal for sole traders: roofers, plumbers and electricians starting to build their pipeline.",
+    includes: ["Strategy call and campaign map", "One construction niche", "Lead capture form and fit checks", "Live dashboard access", "Monthly summary report"],
   },
   {
     name: "Growth",
     price: "£1,500/month",
-    bestFor: "Businesses that want consistent monthly lead delivery and better visibility.",
+    bestFor: "For established contractors ready to scale enquiries across multiple sub-niches.",
     popular: true,
     includes: ["Everything in Starter", "Multi-angle campaign testing", "Lead quality tracking", "Invoice/payment portal", "Monthly optimisation review", "Priority message support"],
   },
   {
     name: "Premium",
     price: "£2,500/month",
-    bestFor: "Established businesses with capacity to handle higher enquiry volume.",
-    includes: ["Everything in Growth", "Multiple service areas or offers", "Advanced reporting", "Higher-touch campaign review", "Priority lead intake process", "Expansion planning"],
+    bestFor: "For larger contractors and remodelling companies with high project values needing consistent volume.",
+    includes: ["Everything in Growth", "Multiple service areas or offers", "Advanced reporting", "Higher-touch campaign review", "Priority enquiry handling", "Expansion planning"],
   },
 ];
 
 const services = [
   [Target, "Lead generation campaign management", "KRAVEX plans and manages acquisition routes designed to capture qualified enquiries."],
   [ShieldCheck, "Lead qualification controls", "Wrong-fit, spam and suspicious enquiries are filtered so reports stay meaningful."],
-  [MessageSquare, "Client portal and messages", "Clients can see leads, invoices, messages and account details in one place."],
+  [MessageSquare, "Dashboard and messages", "You can see leads, invoices, messages and account details in one place."],
   [FileBarChart, "Monthly reporting", "Lead targets, quality split, status and billing visibility are reviewed each month."],
 ];
 
@@ -47,7 +47,7 @@ export default function Page() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">Services</p>
             <h1 className="mt-5 max-w-4xl font-heading text-4xl sm:text-5xl lg:text-6xl">Monthly lead generation, priced clearly.</h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-kravex-secondary">KRAVEX works on a fixed monthly retainer so UK service businesses can plan acquisition without vague invoices or mystery activity. Packages scale by campaign complexity, service area and reporting depth.</p>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-kravex-secondary">KRAVEX works on a fixed monthly retainer so construction trades can plan lead generation without vague invoices or mystery activity.</p>
             <div className="mt-8 flex flex-wrap gap-4">
               <GoldButton href="/contact">Book a Strategy Call</GoldButton>
               <OutlineButton href="/how-it-works">See the Process</OutlineButton>
@@ -56,7 +56,7 @@ export default function Page() {
           <Card className="h-fit">
             <CircleDollarSign className="text-kravex-gold" />
             <h2 className="mt-5 font-heading text-3xl">How pricing works</h2>
-            <p className="mt-4 leading-7 text-kravex-secondary">The retainer covers campaign management, intake systems, qualification, portal access and reporting. Any paid media budget should be agreed separately and visible.</p>
+            <p className="mt-4 leading-7 text-kravex-secondary">The retainer covers campaign management, enquiry capture, fit checks, dashboard access and reporting. Any paid media budget should be agreed separately and visible.</p>
           </Card>
         </div>
       </Section>

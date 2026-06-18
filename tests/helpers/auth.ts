@@ -11,7 +11,7 @@ export async function loginAsAdmin(page: Page) {
 }
 
 export async function loginAsClient(page: Page) {
-  await login(page, "patel@pateldental.co.uk", requiredEnv("E2E_CLIENT_PASSWORD"), "/client/dashboard");
+  await login(page, "rhys@cardiffheatpumps.co.uk", requiredEnv("E2E_CLIENT_PASSWORD"), "/client/dashboard");
 }
 
 async function login(page: Page, email: string, password: string, destination: string) {

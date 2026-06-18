@@ -23,7 +23,7 @@ export default function ClientMessages() {
 
   return (
     <div className="space-y-8">
-      <div><p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">Client Portal</p><h1 className="mt-3 font-heading text-5xl">Messages</h1><p className="mt-3 text-kravex-secondary">Keep every KRAVEX update and reply in one place.</p></div>
+      <div><p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">Client Dashboard</p><h1 className="mt-3 font-heading text-5xl">Messages</h1><p className="mt-3 text-kravex-secondary">Keep every KRAVEX update and reply in one place.</p></div>
       <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
         <Card>
           <h2 className="font-heading text-2xl">Thread</h2>

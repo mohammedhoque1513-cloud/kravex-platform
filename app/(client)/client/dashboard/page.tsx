@@ -18,7 +18,7 @@ export default function ClientDashboard() {
   return (
     <div className="space-y-8">
       <div>
-        <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">Client Portal</p>
+        <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">Client Dashboard</p>
         <h1 className="mt-3 font-heading text-5xl">{greeting}</h1>
         <p className="mt-3 text-kravex-secondary">Here is your KRAVEX overview.</p>
       </div>

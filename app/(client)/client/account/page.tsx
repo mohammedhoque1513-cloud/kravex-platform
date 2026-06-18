@@ -50,7 +50,7 @@ function strength(password: string) {
 export default function AccountPage() {
   const [tab, setTab] = useState<Tab>("profile");
   const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState({ name: "Dr. Ravi Patel", email: "patel@pateldental.co.uk", phone: "", businessName: "Patel Dental" });
+  const [profile, setProfile] = useState({ name: "Rhys Morgan", email: "rhys@cardiffheatpumps.co.uk", phone: "", businessName: "Cardiff Heat Pumps" });
   const [payment, setPayment] = useState<{ brand: string | null; last4: string | null; expiry: string | null }>({ brand: null, last4: null, expiry: null });
   const [notifications, setNotifications] = useState({
     newLeadEmail: true,
@@ -144,7 +144,7 @@ export default function AccountPage() {
     <div className="space-y-8">
       <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">Client Portal</p>
+          <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">Client Dashboard</p>
           <h1 className="mt-3 font-heading text-5xl">My Account</h1>
           <p className="mt-3 max-w-2xl text-kravex-secondary">Manage your profile, payment readiness, password and communication preferences.</p>
         </div>

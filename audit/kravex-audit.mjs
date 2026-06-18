@@ -8,7 +8,7 @@ const screenshotsDir = path.join(outDir, "screenshots");
 
 const adminEmail = "emdadul.hoque@kravex.co.uk";
 const adminPassword = process.env.E2E_ADMIN_PASSWORD;
-const clientEmail = "patel@pateldental.co.uk";
+const clientEmail = "rhys@cardiffheatpumps.co.uk";
 const clientPassword = process.env.E2E_CLIENT_PASSWORD;
 
 if (!adminPassword || !clientPassword) {

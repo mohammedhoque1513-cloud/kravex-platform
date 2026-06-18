@@ -22,7 +22,7 @@ export async function GET() {
         name: dbUser?.name || user.name,
         email: dbUser?.email || user.email,
         phone: dbUser?.client?.phone || "",
-        businessName: dbUser?.client?.businessName || "Patel Dental",
+        businessName: dbUser?.client?.businessName || "Cardiff Heat Pumps",
       },
       paymentMethod: {
         brand: dbUser?.cardBrand || dbUser?.client?.cardBrand || null,
@@ -35,10 +35,10 @@ export async function GET() {
     const profile = listLocal("accountProfiles").find((row: any) => row.userId === user.id) || {
       id: `profile-${user.id}`,
       userId: user.id,
-      name: user.name || "Dr. Ravi Patel",
-      email: user.email || "patel@pateldental.co.uk",
+      name: user.name || "Rhys Morgan",
+      email: user.email || "rhys@cardiffheatpumps.co.uk",
       phone: "",
-      businessName: "Patel Dental",
+      businessName: "Cardiff Heat Pumps",
     };
     const notifications = listLocal("notificationSettings").find((row: any) => row.userId === user.id) || defaultNotifications;
     return json({ mode: "local-json", profile, paymentMethod: { brand: null, last4: null, expiry: null }, notifications });
@@ -54,7 +54,7 @@ export async function PUT(req: NextRequest) {
     name: typeof body.name === "string" ? body.name : "",
     email: typeof body.email === "string" ? body.email.toLowerCase() : "",
     phone: typeof body.phone === "string" ? body.phone : "",
-    businessName: typeof body.businessName === "string" ? body.businessName : "Patel Dental",
+    businessName: typeof body.businessName === "string" ? body.businessName : "Cardiff Heat Pumps",
   };
   if (!data.name || !data.email) return json({ error: "Name and email are required." }, 400);
 

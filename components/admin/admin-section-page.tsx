@@ -18,9 +18,20 @@ import { toast } from "sonner";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card } from "@/components/shared/ui";
 import { formatMoney } from "@/lib/utils";
+import { constructionNiches } from "@/lib/construction-niches";
 import { demoCampaigns, demoClients, demoInvoices, demoLeads, demoProspects, moneyLedger, mrrTrend, vaultPolicy } from "./demo-data";
 
 type SectionKind = "prospects" | "clients" | "leads" | "campaigns" | "invoices" | "payments" | "reports" | "settings";
+
+const tradeTemplates = [
+  ["Roofing", "More roofing jobs in [City]", "We get roofing companies local job enquiries for roof repairs, replacements and storm damage leads."],
+  ["Plumbing", "More plumbing callouts in [City]", "We get plumbers emergency callouts, drain cleaning and leak repair enquiries."],
+  ["HVAC", "More HVAC installs in [City]", "We get HVAC companies AC, furnace and heat pump installation enquiries."],
+  ["Electrical", "More electrical jobs in [City]", "We get electricians EV charger, rewiring and consumer unit upgrade enquiries."],
+  ["Home Remodelling", "More remodelling projects in [City]", "We get remodel contractors kitchen, bathroom and full renovation enquiries."],
+  ["Concrete", "More concrete jobs in [City]", "We get concrete contractors driveway, patio and foundation enquiries."],
+  ["Foundation Repair", "More foundation repair leads in [City]", "We get foundation contractors underpinning, waterproofing and structural repair enquiries."],
+];
 
 function Badge({ children, tone = "gold" }: { children: React.ReactNode; tone?: "gold" | "green" | "red" | "amber" | "grey" | "blue" }) {
   const tones = {
@@ -106,7 +117,7 @@ export function AdminSectionPage({ kind }: { kind: SectionKind }) {
 
   const copy = {
     prospects: ["Prospects", "Move prospects from first touch to signed client with clear follow-up discipline.", "Add Prospect"],
-    clients: ["Clients", "Manage retainers, lead targets, invoice status and client portal access.", "Add Client"],
+    clients: ["Clients", "Manage retainers, lead targets, invoice status and client dashboard access.", "Add Client"],
     leads: ["Leads", "Log, filter, qualify and export every lead delivered to every client.", "Log Lead"],
     campaigns: ["Campaigns", "Track acquisition platforms, performance, cost per lead and campaign status.", "Add Campaign"],
     invoices: ["Invoices", "Create, send, chase, mark paid and download invoices.", "Create Invoice"],
@@ -273,7 +284,7 @@ function ReportsPage() {
   return (
     <div className="grid gap-6 xl:grid-cols-[1.1fr_.9fr]">
       <Card><h2 className="font-heading text-2xl">Agency report</h2>{chartData.every((item) => item.mrr === 0 && item.leads === 0) ? <EmptyState title="No report data yet" body="Agency reporting starts once real payments, clients and leads are recorded." /> : <div className="mt-6 h-80"><ResponsiveContainer width="100%" height="100%"><BarChart data={chartData}><CartesianGrid stroke="#2a2a2a" vertical={false} /><XAxis dataKey="month" stroke="#a0a0a0" /><YAxis stroke="#a0a0a0" /><Tooltip contentStyle={{ background: "#111", border: "1px solid #2a2a2a" }} /><Bar dataKey="mrr" fill="#c9a84c" radius={4} /><Bar dataKey="leads" fill="#606060" radius={4} /></BarChart></ResponsiveContainer></div>}</Card>
-      <Card><h2 className="font-heading text-2xl">Client report generator</h2><div className="mt-6 grid gap-4"><select className="rounded border border-kravex-border bg-black px-4 py-3"><option>Patel Dental</option><option>Metro Roofing</option></select><input type="month" defaultValue="2026-05" className="rounded border border-kravex-border bg-black px-4 py-3" /><button onClick={() => toast.success("Client report generated")} className="rounded bg-kravex-gold px-5 py-3 font-bold text-black">Generate report</button><button onClick={() => toast.success("PDF export prepared")} className="rounded border border-kravex-gold px-5 py-3 font-bold text-kravex-gold">Download PDF</button></div></Card>
+      <Card><h2 className="font-heading text-2xl">Contractor report generator</h2><div className="mt-6 grid gap-4"><select className="rounded border border-kravex-border bg-black px-4 py-3"><option>Cardiff Heat Pumps</option><option>Metro Roofing</option></select><input type="month" defaultValue="2026-05" className="rounded border border-kravex-border bg-black px-4 py-3" /><button onClick={() => toast.success("Client report generated")} className="rounded bg-kravex-gold px-5 py-3 font-bold text-black">Generate report</button><button onClick={() => toast.success("PDF export prepared")} className="rounded border border-kravex-gold px-5 py-3 font-bold text-kravex-gold">Download PDF</button></div></Card>
     </div>
   );
 }
@@ -284,7 +295,26 @@ function SettingsPage() {
   return (
     <div className="grid gap-6 xl:grid-cols-[260px_1fr]">
       <Card className="h-fit"><div className="grid gap-2">{tabs.map((item) => <button key={item} onClick={() => setTab(item)} className={`rounded px-4 py-3 text-left text-sm font-bold ${tab === item ? "bg-kravex-gold text-black" : "text-kravex-secondary hover:bg-black hover:text-kravex-gold"}`}>{item}</button>)}</div></Card>
-      <Card><h2 className="font-heading text-3xl">{tab}</h2><div className="mt-6 grid gap-4 sm:grid-cols-2"><input defaultValue="KRAVEX" className="rounded border border-kravex-border bg-black px-4 py-3" /><input defaultValue="hello@kravex.co.uk" className="rounded border border-kravex-border bg-black px-4 py-3" /><input defaultValue="KRX" className="rounded border border-kravex-border bg-black px-4 py-3" /><input defaultValue="20" className="rounded border border-kravex-border bg-black px-4 py-3" /><textarea defaultValue="Premium UK lead generation agency." className="min-h-32 rounded border border-kravex-border bg-black px-4 py-3 sm:col-span-2" /><button onClick={() => toast.success(`${tab} saved`)} className="rounded bg-kravex-gold px-5 py-3 font-bold text-black sm:col-span-2">Save changes</button></div></Card>
+      <Card>
+        <h2 className="font-heading text-3xl">{tab}</h2>
+        {tab === "Email Templates" ? (
+          <div className="mt-6 grid gap-4">
+            {tradeTemplates.map(([trade, subject, body]) => (
+              <div key={trade} className="rounded border border-kravex-border bg-black p-4">
+                <p className="text-xs font-bold uppercase tracking-[.2em] text-kravex-gold">{trade}</p>
+                <input defaultValue={subject} className="mt-3 w-full rounded border border-kravex-border bg-kravex-card px-4 py-3" />
+                <textarea defaultValue={`Hi [Name],\n\nI came across [Company]. Looks like you do solid ${trade.toLowerCase()} work in [area].\n\nI run KRAVEX. ${body} on a fixed monthly basis.\n\nWorth a 15-minute call this week?\n\nEmdadul\nKRAVEX\nemdadul.hoque@kravex.co.uk`} className="mt-3 min-h-48 w-full rounded border border-kravex-border bg-kravex-card px-4 py-3" />
+              </div>
+            ))}
+          </div>
+        ) : tab === "Niches" ? (
+          <div className="mt-6 grid gap-3">
+            {constructionNiches.map((item) => <p key={item} className="rounded border border-kravex-border bg-black px-4 py-3 font-bold">{item}</p>)}
+          </div>
+        ) : (
+          <div className="mt-6 grid gap-4 sm:grid-cols-2"><input defaultValue="KRAVEX" className="rounded border border-kravex-border bg-black px-4 py-3" /><input defaultValue="hello@kravex.co.uk" className="rounded border border-kravex-border bg-black px-4 py-3" /><input defaultValue="KRX" className="rounded border border-kravex-border bg-black px-4 py-3" /><input defaultValue="20" className="rounded border border-kravex-border bg-black px-4 py-3" /><textarea defaultValue="Premium UK construction lead generation agency." className="min-h-32 rounded border border-kravex-border bg-black px-4 py-3 sm:col-span-2" /><button onClick={() => toast.success(`${tab} saved`)} className="rounded bg-kravex-gold px-5 py-3 font-bold text-black sm:col-span-2">Save changes</button></div>
+        )}
+      </Card>
     </div>
   );
 }

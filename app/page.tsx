@@ -22,27 +22,45 @@ import { LeadCaptureForm } from "@/components/shared/lead-capture-form";
 const industries = [
   {
     icon: Sparkles,
-    title: "Roof Repairs",
-    copy: "You get urgent repair enquiries from homeowners who need help fast.",
-    leadTypes: "Leak repair, storm damage, emergency callout",
+    title: "Roofing",
+    copy: "Storm damage, replacements and repairs",
+    leadTypes: "Average job GBP5k-GBP20k+",
   },
   {
     icon: BadgeCheck,
-    title: "Roof Replacements",
-    copy: "You get quote requests for bigger jobs worth proper follow-up.",
-    leadTypes: "Full replacement, reroof quote, inspection request",
+    title: "Plumbing",
+    copy: "Emergency callouts, leaks and drain work",
+    leadTypes: "Fast, high-intent searches",
   },
   {
     icon: BriefcaseBusiness,
-    title: "Guttering & Fascias",
-    copy: "You get smaller job enquiries that can keep your diary moving.",
-    leadTypes: "Gutter repair, fascia quote, roofline work",
+    title: "HVAC",
+    copy: "AC, furnaces, heat pumps and emergency repairs",
+    leadTypes: "Seasonal high-ticket demand",
   },
   {
     icon: ShieldCheck,
-    title: "Flat Roofing",
-    copy: "You get enquiries for felt, GRP and commercial roof work.",
-    leadTypes: "Flat roof quote, repair request, commercial lead",
+    title: "Electrical",
+    copy: "EV chargers, rewiring and consumer units",
+    leadTypes: "Growing certified trade demand",
+  },
+  {
+    icon: TrendingUp,
+    title: "Home Remodelling",
+    copy: "Kitchens, bathrooms and full renovations",
+    leadTypes: "High project values",
+  },
+  {
+    icon: Check,
+    title: "Concrete",
+    copy: "Driveways, patios and foundations",
+    leadTypes: "Quote-led local work",
+  },
+  {
+    icon: LockKeyhole,
+    title: "Foundation Repair",
+    copy: "Underpinning, waterproofing and structural work",
+    leadTypes: "Urgent high-margin repairs",
   },
 ];
 
@@ -95,9 +113,9 @@ function PortalPreview() {
           </div>
         </div>
         {[
-          ["Leak repair", "Roof Repairs", "HOT", "Needs call today"],
-          ["Quote request", "Roof Replacements", "WARM", "Inspection needed"],
-          ["Gutter repair", "Guttering & Fascias", "WARM", "Details captured"],
+          ["Storm damage", "Roofing", "HOT", "Needs call today"],
+          ["Leak repair", "Plumbing", "HOT", "Emergency callout"],
+          ["Heat pump quote", "HVAC", "WARM", "Installation enquiry"],
         ].map((lead) => (
           <div key={lead[0]} className="grid gap-3 rounded border border-kravex-border bg-black p-4 sm:grid-cols-[1fr_auto]">
             <div>
@@ -120,10 +138,10 @@ export default function Home() {
           <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
             <Eyebrow>UK Lead Generation Agency</Eyebrow>
             <h1 className="mt-5 max-w-4xl font-heading text-4xl leading-[.98] text-white sm:text-6xl lg:text-7xl">
-              Qualified roofing leads for your next booked job.
+              Qualified construction leads for your next booked job.
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-kravex-secondary">
-              You get roofing enquiries from people ready to book your work.
+              You get booked enquiries for your trade every month.
             </p>
             <div className="mt-8 grid gap-3 text-sm text-white sm:grid-cols-2">
               {["Fixed monthly retainer", "Qualified enquiries", "Your live lead dashboard", "UK-only service areas"].map((item) => (
@@ -149,7 +167,7 @@ export default function Home() {
       <section className="border-y border-kravex-gold/70 bg-kravex-dark px-5 py-8">
         <div className="mx-auto grid max-w-7xl gap-5 text-sm md:grid-cols-4">
           {[
-            ["Who", "You rely on word of mouth and need steadier roofing work"],
+            ["Who", "You rely on word of mouth and need steadier construction work"],
             ["What", "You get qualified enquiries every month"],
             ["How", "Your campaign finds people who need your service"],
             ["Outcome", "More booked jobs. Less time chasing."],

@@ -17,7 +17,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         <div className="flex h-full flex-col">
           <div>
             <BrandLogo />
-            <p className="mt-3 text-sm text-kravex-secondary">Client Portal</p>
+            <p className="mt-3 text-sm text-kravex-secondary">Client Dashboard</p>
             <nav className="mt-10 grid gap-2">
               {links.map(({ label, href, icon }) => (
                 <PortalNavLink key={href} href={href} label={label} icon={icon} variant="client-desktop" />

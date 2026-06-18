@@ -13,6 +13,7 @@ export const leadFormSchema = z.object({
   email: emailSchema,
   phone: ukPhone,
   service: z.string().min(2),
+  subService: z.string().min(2).optional(),
   city: z.string().min(2),
   budget: z.string().optional(),
   source: z.enum(["HOME_PAGE", "PHONE_CALL", "SIGN_UP", "GET_STARTED"]).default("HOME_PAGE"),

@@ -166,7 +166,7 @@ def main():
     for item in [
         "Public marketing routes exist and returned HTTP 200 across desktop, tablet and phone.",
         "The public homepage now explains the service clearly: UK lead generation for service businesses, fixed monthly retainer, lead delivery and client portal.",
-        "Public pages have real page-specific content for How It Works, Services, Industries, Results, About, Contact and legal pages.",
+        "Public pages have real page-specific content for How It Works, Services, Industries, Results, About, Contact and terms pages.",
         "Client dashboard can render a real portal-style view when client auth completes.",
         "Unauthenticated admin/client API calls return 401 instead of leaking data.",
         "The design system is no longer stylesheet-missing bland HTML during healthy server operation.",

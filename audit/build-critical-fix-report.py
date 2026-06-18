@@ -110,7 +110,7 @@ status_table(doc, [
 heading(doc, "Verified database records")
 for text in [
     "3 users, including one admin and two client portal users.",
-    "2 clients: Patel Dental and Metro Roofing.",
+    "2 clients: Cardiff Heat Pumps and Metro Roofing.",
     "3 prospects, 8 leads, 2 invoices, 2 campaigns and 3 settings.",
     "5 money vaults using the 30/5/20/10/35 allocation policy.",
     "LeadForm rows created by regression tests are persisted in PostgreSQL.",

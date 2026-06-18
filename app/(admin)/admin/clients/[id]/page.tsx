@@ -18,9 +18,9 @@ export default function Page() {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        businessName: "Patel Dental",
-        contactName: "Dr. Ravi Patel",
-        email: "patel@pateldental.co.uk",
+        businessName: "Cardiff Heat Pumps",
+        contactName: "Rhys Morgan",
+        email: "rhys@cardiffheatpumps.co.uk",
       }),
     });
     setCreating(false);
@@ -42,8 +42,8 @@ export default function Page() {
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">Client profile</p>
-          <h1 className="mt-3 font-heading text-5xl">Patel Dental</h1>
-          <p className="mt-3 text-kravex-secondary">Cosmetic Dentistry · Birmingham · {formatMoney(150000)} monthly retainer</p>
+          <h1 className="mt-3 font-heading text-5xl">Cardiff Heat Pumps</h1>
+          <p className="mt-3 text-kravex-secondary">HVAC · Birmingham · {formatMoney(150000)} monthly retainer</p>
         </div>
         <div className="flex flex-wrap gap-3">
           <button className="rounded bg-kravex-gold px-5 py-3 font-bold text-black">Create Invoice</button>
@@ -76,7 +76,7 @@ export default function Page() {
         <Card><p className="text-sm text-kravex-secondary">Lead target</p><p className="mt-3 font-mono text-4xl text-kravex-gold">0 / 20</p><div className="mt-4 h-2 rounded bg-black"><div className="h-2 w-0 rounded bg-kravex-gold" /></div></Card>
         <Card><p className="text-sm text-kravex-secondary">Invoice status</p><p className="mt-3 font-mono text-4xl text-kravex-secondary">None</p></Card>
       </div>
-      <Card><h2 className="font-heading text-2xl">Client information</h2><div className="mt-6 grid gap-4 md:grid-cols-2"><input defaultValue="Patel Dental" className="rounded border border-kravex-border bg-black px-4 py-3" /><input defaultValue="Dr. Ravi Patel" className="rounded border border-kravex-border bg-black px-4 py-3" /><input defaultValue="patel@pateldental.co.uk" className="rounded border border-kravex-border bg-black px-4 py-3" /><input defaultValue="Cosmetic Dentistry" className="rounded border border-kravex-border bg-black px-4 py-3" /><textarea defaultValue="Priority client. Focus on implant enquiries and private consultations." className="min-h-32 rounded border border-kravex-border bg-black px-4 py-3 md:col-span-2" /></div></Card>
+      <Card><h2 className="font-heading text-2xl">Client information</h2><div className="mt-6 grid gap-4 md:grid-cols-2"><input defaultValue="Cardiff Heat Pumps" className="rounded border border-kravex-border bg-black px-4 py-3" /><input defaultValue="Rhys Morgan" className="rounded border border-kravex-border bg-black px-4 py-3" /><input defaultValue="rhys@cardiffheatpumps.co.uk" className="rounded border border-kravex-border bg-black px-4 py-3" /><input defaultValue="HVAC" className="rounded border border-kravex-border bg-black px-4 py-3" /><textarea defaultValue="Priority client. Focus on heat pump installation and emergency repair enquiries." className="min-h-32 rounded border border-kravex-border bg-black px-4 py-3 md:col-span-2" /></div></Card>
     </div>
   );
 }

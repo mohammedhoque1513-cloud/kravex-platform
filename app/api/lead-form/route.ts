@@ -15,6 +15,7 @@ function leadNotes(body: ReturnType<typeof leadFormSchema.parse>) {
   return [
     `Business: ${body.businessName}`,
     `Industry: ${body.service}`,
+    body.subService ? `Sub-service: ${body.subService}` : null,
     `City: ${body.city}`,
     body.budget ? `Monthly budget: ${body.budget}` : null,
     body.referralSource ? `Heard from: ${body.referralSource}` : null,

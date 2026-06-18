@@ -18,7 +18,7 @@ export default function ClientInvoices() {
 
   return (
     <div className="space-y-8">
-      <div><p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">Client Portal</p><h1 className="mt-3 font-heading text-5xl">Invoices</h1><p className="mt-3 text-kravex-secondary">View invoices, download PDFs and pay outstanding balances securely through Stripe.</p></div>
+      <div><p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">Client Dashboard</p><h1 className="mt-3 font-heading text-5xl">Invoices</h1><p className="mt-3 text-kravex-secondary">View invoices, download PDFs and pay outstanding balances securely through Stripe.</p></div>
       <div className="grid gap-6 xl:grid-cols-[1fr_420px]">
         <Card>
           <h2 className="font-heading text-2xl">Invoice list</h2>

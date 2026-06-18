@@ -1,4 +1,4 @@
-﻿import type { NextAuthOptions } from "next-auth";
+import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { verify } from "otplib";
@@ -44,7 +44,7 @@ function demoUsers() {
   if (!adminPassword || !clientPassword) return [];
   return [
     { id: "demo-admin", name: "Emdadul Hoque", email: "emdadul.hoque@kravex.co.uk", password: adminPassword, role: "ADMIN", clientId: null },
-    { id: "demo-patel", name: "Dr. Ravi Patel", email: "patel@pateldental.co.uk", password: clientPassword, role: "CLIENT", clientId: "demo-patel-client" },
+    { id: "demo-patel", name: "Rhys Morgan", email: "rhys@cardiffheatpumps.co.uk", password: clientPassword, role: "CLIENT", clientId: "demo-patel-client" },
     { id: "demo-metro", name: "Mike Dawson", email: "mike@metroroofing.co.uk", password: clientPassword, role: "CLIENT", clientId: "demo-metro-client" },
   ] as const;
 }

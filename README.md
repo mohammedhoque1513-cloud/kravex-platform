@@ -1,6 +1,6 @@
 # KRAVEX Platform
 
-KRAVEX is a Next.js 14 lead generation platform with a public marketing site, admin portal, client portal, PostgreSQL schema, Stripe payments, Resend email, PDF/storage hooks, scheduled jobs, money-vault ledger logic and local fallbacks for development.
+KRAVEX is a Next.js 14 lead generation platform with a public marketing site, admin portal, client dashboard, PostgreSQL schema, Stripe payments, Resend email, PDF/storage hooks, scheduled jobs, money-vault ledger logic and local fallbacks for development.
 
 ## Local Access
 

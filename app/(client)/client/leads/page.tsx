@@ -29,7 +29,7 @@ export default function ClientLeads() {
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
-        <div><p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">Client Portal</p><h1 className="mt-3 font-heading text-5xl">My Leads</h1><p className="mt-3 text-kravex-secondary">Review, call, email, update and export every lead KRAVEX delivers.</p></div>
+        <div><p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">Client Dashboard</p><h1 className="mt-3 font-heading text-5xl">My Leads</h1><p className="mt-3 text-kravex-secondary">Review, call, email, update and export every lead KRAVEX delivers.</p></div>
         <button onClick={exportCsv} className="inline-flex items-center justify-center gap-2 rounded border border-kravex-gold px-5 py-3 font-bold text-kravex-gold hover:bg-kravex-gold hover:text-black"><Download size={18} />Download CSV</button>
       </div>
       <Card>

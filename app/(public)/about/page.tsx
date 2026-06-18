@@ -6,7 +6,7 @@ const values = [
   [Eye, "Clarity", "Clients should understand what is being done, what arrived, what it cost and what needs improving."],
   [Gauge, "Speed", "A lead loses value when nobody responds. KRAVEX is designed around fast capture and visible follow-up."],
   [BadgeCheck, "Quality", "A pipeline full of bad-fit contacts is not success. Lead criteria matter."],
-  [LockKeyhole, "Discipline", "Client data, payments, account access and reporting need controlled systems, not loose spreadsheets."],
+  [LockKeyhole, "Discipline", "Customer data, payments, account access and reporting need controlled systems, not loose spreadsheets."],
 ];
 
 export default function Page() {
@@ -17,7 +17,7 @@ export default function Page() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">About KRAVEX</p>
             <h1 className="mt-5 max-w-4xl font-heading text-4xl sm:text-5xl lg:text-6xl">Premium lead generation, run with discipline.</h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-kravex-secondary">KRAVEX exists for UK service businesses that are tired of vague marketing retainers, messy lead tracking and not knowing whether their pipeline is actually improving.</p>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-kravex-secondary">KRAVEX exists for UK construction trades that are tired of vague marketing retainers, messy lead tracking and not knowing whether their pipeline is actually improving.</p>
             <div className="mt-8 flex flex-wrap gap-4">
               <GoldButton href="/contact">Book a Strategy Call</GoldButton>
               <OutlineButton href="/how-it-works">How It Works</OutlineButton>
@@ -38,9 +38,9 @@ export default function Page() {
             <h2 className="mt-4 font-heading text-4xl sm:text-5xl">Built to replace vague marketing with accountable pipeline delivery.</h2>
           </div>
           <div className="space-y-5 leading-8 text-gray-600">
-            <p>Many small and growing UK businesses know they need more enquiries, but the usual options are frustrating: random ads, confusing reports, agencies that talk in jargon, or lead suppliers that provide contacts with no context.</p>
-            <p>KRAVEX is being built as a cleaner system. The public site attracts enquiries, the admin portal manages prospects, clients, campaigns, invoices and payments, and the client portal gives paying clients visibility over their leads.</p>
-            <p>The mission is straightforward: help serious service businesses fill their pipeline every month, while keeping the work transparent enough that nobody has to guess what is happening.</p>
+            <p>Many small and growing UK contractors know they need more enquiries, but the usual options are frustrating: random ads, confusing reports, agencies that talk in jargon, or lead suppliers that provide contacts with no context.</p>
+            <p>KRAVEX is being built as a cleaner system. The public site attracts enquiries, the admin dashboard manages prospects, clients, campaigns, invoices and payments, and the client dashboard gives paying clients visibility over their leads.</p>
+            <p>The mission is straightforward: help serious construction trades fill their pipeline every month, while keeping the work transparent enough that nobody has to guess what is happening.</p>
           </div>
         </div>
       </Section>
@@ -72,7 +72,7 @@ export default function Page() {
             {[
               [Target, "Public lead capture", "People can request a strategy call without needing an account."],
               [MessageSquare, "Admin control", "Prospects, client records, lead delivery, invoices and messages are managed centrally."],
-              [UserRound, "Client visibility", "Paying clients can see leads, invoices, messages and account details."],
+              [UserRound, "Customer visibility", "Paying clients can see leads, invoices, messages and account details."],
               [LockKeyhole, "Security mindset", "Role protection, 2FA support, payment tokenisation and no public file uploads are part of the system."],
             ].map(([Icon, title, copy]: any) => (
               <div key={title} className="rounded-lg border border-black/15 p-5">
@@ -90,11 +90,11 @@ export default function Page() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">Trust Signals</p>
             <h2 className="mt-4 font-heading text-4xl sm:text-5xl">Premium does not mean flashy. It means controlled.</h2>
-            <p className="mt-6 leading-8 text-kravex-secondary">The KRAVEX standard is black-and-gold on the surface, but the real premium feel comes from discipline: clear data, clean portals, honest limits and secure payment handling.</p>
+            <p className="mt-6 leading-8 text-kravex-secondary">The KRAVEX standard is black-and-gold on the surface, but the real premium feel comes from discipline: clear data, clean dashboards, honest limits and secure payment handling.</p>
           </div>
           <Card>
             <div className="grid gap-3 text-sm text-kravex-secondary">
-              {["UK-focused agency", "Fixed monthly retainer model", "Client portal for visibility", "Lead qualification rules", "Stripe-based payment handling", "No hidden card storage"].map((item) => (
+              {["UK-focused agency", "Fixed monthly retainer model", "Client dashboard for visibility", "Lead fit checks", "Stripe-based payment handling", "No hidden card storage"].map((item) => (
                 <p key={item} className="flex gap-3"><Check className="text-kravex-gold" size={18} />{item}</p>
               ))}
             </div>
