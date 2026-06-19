@@ -3,17 +3,36 @@
 @tailwind utilities;
 :root { color-scheme: dark; }
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; text-rendering: geometricPrecision; }
 html, body { max-width: 100%; overflow-x: hidden; }
-body { margin: 0; background: #0a0a0a; color: #fff; font-family: var(--font-inter), sans-serif; }
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(201, 168, 76, .08), transparent 34rem),
+    linear-gradient(180deg, #0a0a0a 0%, #111111 52%, #0a0a0a 100%);
+  color: #fff;
+  font-family: var(--font-inter), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 a { color: inherit; text-decoration: none; }
 button,input,textarea,select { font: inherit; }
 input,textarea,select { min-width: 0; }
 table { border-collapse: collapse; }
 ::selection { background: rgba(201,168,76,.35); color: #fff; }
 .gold-focus:focus { outline: 2px solid #c9a84c; outline-offset: 2px; }
-.particle-field { background-image: radial-gradient(circle at 20% 20%, rgba(201,168,76,.16) 0 1px, transparent 2px), radial-gradient(circle at 80% 40%, rgba(232,201,122,.12) 0 1px, transparent 2px), radial-gradient(circle at 40% 70%, rgba(160,128,48,.14) 0 1px, transparent 2px); background-size: 140px 140px, 220px 220px, 180px 180px; animation: float-bg 18s linear infinite; }
+.particle-field {
+  background-image:
+    linear-gradient(110deg, rgba(201,168,76,.10), transparent 28%, transparent 72%, rgba(201,168,76,.06)),
+    radial-gradient(circle at 20% 20%, rgba(201,168,76,.16) 0 1px, transparent 2px),
+    radial-gradient(circle at 80% 40%, rgba(232,201,122,.10) 0 1px, transparent 2px),
+    radial-gradient(circle at 40% 70%, rgba(160,128,48,.12) 0 1px, transparent 2px);
+  background-size: auto, 140px 140px, 220px 220px, 180px 180px;
+  animation: float-bg 18s linear infinite;
+}
 @keyframes float-bg { from { background-position: 0 0,0 0,0 0; } to { background-position: 140px -140px,-220px 220px,180px 180px; } }
+
+.font-heading { letter-spacing: 0; }
 
 @media (max-width: 640px) {
   .font-heading.text-5xl,

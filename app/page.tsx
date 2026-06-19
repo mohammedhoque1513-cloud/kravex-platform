@@ -88,19 +88,19 @@ const notIncluded = [
 ];
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-gold">{children}</p>;
+  return <p className="text-xs font-extrabold uppercase tracking-[.28em] text-kravex-gold">{children}</p>;
 }
 
 function PortalPreview() {
   return (
-    <div className="relative overflow-hidden rounded-lg border border-kravex-gold/50 bg-[#0d0d0d] p-5 shadow-gold">
-      <div className="absolute right-0 top-0 h-40 w-40 rounded-bl-full bg-kravex-gold/10" />
+    <div className="relative overflow-hidden rounded-md border border-kravex-gold/45 bg-gradient-to-b from-[#171717] to-[#070707] p-5 shadow-[0_30px_90px_rgba(0,0,0,.55),0_0_45px_rgba(201,168,76,.10)]">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-kravex-gold to-transparent" />
       <div className="relative flex items-center justify-between border-b border-kravex-border pb-4">
         <div>
           <p className="font-heading text-2xl">Lead dashboard</p>
           <p className="text-sm text-kravex-secondary">Your live lead view</p>
         </div>
-        <span className="rounded border border-kravex-gold/40 px-3 py-1 text-xs font-bold uppercase text-kravex-gold">Secure</span>
+        <span className="rounded-md border border-kravex-gold/40 bg-kravex-gold/10 px-3 py-1 text-xs font-bold uppercase text-kravex-gold">Secure</span>
       </div>
       <div className="relative mt-5 grid gap-4">
         <div>
@@ -108,8 +108,8 @@ function PortalPreview() {
             <p className="text-sm text-kravex-secondary">Monthly target</p>
             <p className="font-mono text-kravex-gold">Set per client</p>
           </div>
-          <div className="mt-3 h-2 rounded-full bg-black">
-            <div className="h-2 w-2/3 rounded-full bg-kravex-gold" />
+          <div className="mt-3 h-2 bg-black">
+            <div className="h-2 w-2/3 bg-gradient-to-r from-kravex-mutedGold to-kravex-lightGold" />
           </div>
         </div>
         {[
@@ -117,12 +117,12 @@ function PortalPreview() {
           ["Leak repair", "Plumbing", "HOT", "Emergency callout"],
           ["Heat pump quote", "HVAC", "WARM", "Installation enquiry"],
         ].map((lead) => (
-          <div key={lead[0]} className="grid gap-3 rounded border border-kravex-border bg-black p-4 sm:grid-cols-[1fr_auto]">
+          <div key={lead[0]} className="grid gap-3 rounded-md border border-kravex-border bg-black/80 p-4 sm:grid-cols-[1fr_auto]">
             <div>
               <p className="font-bold text-white">{lead[0]}</p>
               <p className="mt-1 text-sm text-kravex-secondary">{lead[1]} - {lead[3]}</p>
             </div>
-            <span className="h-fit rounded bg-kravex-gold px-3 py-1 text-xs font-bold text-black">{lead[2]}</span>
+            <span className="h-fit rounded-sm bg-kravex-gold px-3 py-1 text-xs font-bold text-black">{lead[2]}</span>
           </div>
         ))}
       </div>
@@ -133,9 +133,9 @@ function PortalPreview() {
 export default function Home() {
   return (
     <PublicShell>
-      <section className="particle-field bg-kravex-black px-5 py-24 sm:px-8 lg:px-12">
-        <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-7xl items-center gap-12 lg:grid-cols-[1.04fr_.96fr]">
-          <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
+      <section className="particle-field bg-kravex-black px-5 pb-20 pt-10 sm:px-8 sm:py-24 lg:px-12">
+        <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-7xl items-start gap-12 pt-8 sm:items-center sm:pt-0 lg:grid-cols-[1.04fr_.96fr]">
+          <div>
             <Eyebrow>UK Lead Generation Agency</Eyebrow>
             <h1 className="mt-5 max-w-4xl font-heading text-4xl leading-[.98] text-white sm:text-6xl lg:text-7xl">
               Qualified construction leads for your next booked job.
@@ -155,7 +155,7 @@ export default function Home() {
               <GoldButton href="#lead-form">Request a Free Strategy Call</GoldButton>
               <OutlineButton href="#what-we-do">What KRAVEX Does</OutlineButton>
             </div>
-          </motion.div>
+          </div>
 
           <motion.div animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 6 }} className="relative">
             <div className="absolute inset-8 rounded-full bg-kravex-gold/20 blur-3xl" />
@@ -180,7 +180,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Section id="what-we-do" className="bg-white text-black">
+      <Section id="what-we-do" className="border-y border-kravex-border bg-[#f5f2e8] text-black">
         <div className="max-w-3xl">
             <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-mutedGold">The service</p>
             <h2 className="mt-4 font-heading text-4xl sm:text-5xl">KRAVEX runs your lead pipeline, not just your adverts.</h2>
@@ -199,7 +199,7 @@ export default function Home() {
               You get the most from KRAVEX when one good job is worth chasing properly.
             </p>
           </div>
-          <div className="rounded-lg border border-kravex-border bg-kravex-card p-6">
+          <div className="rounded-md border border-kravex-border bg-gradient-to-b from-[#1b1b1b] to-[#101010] p-6 shadow-[0_18px_55px_rgba(0,0,0,.28)]">
             <p className="font-bold text-white">You are a good fit when you have:</p>
             <div className="mt-5 grid gap-3 text-sm text-kravex-secondary">
               {[
@@ -217,7 +217,7 @@ export default function Home() {
 
         <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           {industries.map(({ icon: Icon, title, copy, leadTypes }) => (
-            <div key={title} className="rounded-lg border border-kravex-border bg-kravex-card p-6 transition hover:border-kravex-gold">
+            <div key={title} className="rounded-md border border-kravex-border bg-gradient-to-b from-[#1b1b1b] to-[#101010] p-6 shadow-[0_18px_55px_rgba(0,0,0,.22)] transition hover:border-kravex-gold">
               <Icon className="text-kravex-gold" />
               <h3 className="mt-5 font-heading text-2xl">{title}</h3>
               <p className="mt-3 text-sm leading-6 text-kravex-secondary">{copy}</p>
@@ -237,7 +237,7 @@ export default function Home() {
         </div>
         <div className="mt-10 grid gap-5 md:grid-cols-5">
           {leadDefinition.map((item, index) => (
-            <div key={item} className="rounded-lg border border-kravex-border bg-black p-5">
+            <div key={item} className="rounded-md border border-kravex-border bg-black p-5">
               <p className="font-mono text-sm text-kravex-gold">0{index + 1}</p>
               <p className="mt-4 text-sm leading-6 text-white">{item}</p>
             </div>
@@ -245,7 +245,7 @@ export default function Home() {
         </div>
       </Section>
 
-      <Section className="bg-white text-black">
+      <Section className="border-y border-kravex-border bg-[#f5f2e8] text-black">
         <div className="grid gap-12 lg:grid-cols-[.9fr_1.1fr]">
           <div>
             <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-mutedGold">The Process</p>
@@ -257,8 +257,8 @@ export default function Home() {
           </div>
           <div className="grid gap-4">
             {deliverySteps.map(([number, title, copy]) => (
-              <div key={number} className="grid gap-4 rounded-lg border border-black/15 p-5 sm:grid-cols-[72px_1fr]">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-black font-mono text-kravex-gold">{number}</div>
+              <div key={number} className="grid gap-4 rounded-md border border-black/15 bg-white/45 p-5 shadow-[0_12px_35px_rgba(0,0,0,.06)] sm:grid-cols-[72px_1fr]">
+                <div className="flex h-14 w-14 items-center justify-center rounded-md bg-black font-mono text-kravex-gold">{number}</div>
                 <div>
                   <h3 className="font-bold">{title}</h3>
                   <p className="mt-2 text-sm leading-6 text-gray-600">{copy}</p>
@@ -308,7 +308,7 @@ export default function Home() {
         </div>
       </Section>
 
-      <Section className="bg-white text-black">
+      <Section className="border-y border-kravex-border bg-[#f5f2e8] text-black">
         <div className="grid gap-10 lg:grid-cols-[.9fr_1.1fr]">
           <div>
             <p className="text-xs font-bold uppercase tracking-[.3em] text-kravex-mutedGold">Honest Boundaries</p>
@@ -319,7 +319,7 @@ export default function Home() {
           </div>
           <div className="grid gap-4">
             {notIncluded.map((item) => (
-              <div key={item} className="rounded-lg border border-black/15 p-5 text-sm leading-6 text-gray-700">
+              <div key={item} className="rounded-md border border-black/15 bg-white/45 p-5 text-sm leading-6 text-gray-700 shadow-[0_12px_35px_rgba(0,0,0,.06)]">
                 {item}
               </div>
             ))}
@@ -352,13 +352,13 @@ export default function Home() {
         </div>
       </Section>
 
-      <section className="bg-kravex-gold px-5 py-20 text-black">
+      <section className="border-t border-kravex-lightGold bg-kravex-gold px-5 py-20 text-black">
         <div className="mx-auto flex max-w-7xl flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h2 className="font-heading text-4xl sm:text-5xl">Ready to make the pipeline visible?</h2>
             <p className="mt-4 max-w-2xl leading-7">Book the strategy call and see whether KRAVEX can bring you better enquiries.</p>
           </div>
-          <a href="#lead-form" className="inline-flex items-center justify-center gap-2 rounded bg-black px-6 py-4 font-bold text-white">
+          <a href="#lead-form" className="inline-flex items-center justify-center gap-2 border border-black bg-black px-6 py-4 text-xs font-extrabold uppercase tracking-[.16em] text-white">
             Request a Free Strategy Call
             <ArrowRight size={18} />
           </a>
